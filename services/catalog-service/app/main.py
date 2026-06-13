@@ -4,6 +4,14 @@ from fastapi import Depends, FastAPI, HTTPException, Response, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app.cache import (
+    build_book_detail_cache_key,
+    build_books_list_cache_key,
+    check_redis_connection,
+    get_json_cache,
+    invalidate_books_cache,
+    set_json_cache,
+)
 from app.crud import (
     book_to_response,
     create_book,
@@ -27,6 +35,7 @@ class HealthResponse(BaseModel):
     status: Literal["ok"]
     service: str
     database: Literal["ok"]
+    cache: Literal["ok"]
 
 
 app = FastAPI(
@@ -39,14 +48,16 @@ app = FastAPI(
 @app.get("/health", response_model=HealthResponse)
 def health_check() -> HealthResponse:
     database_is_connected = check_database_connection()
+    cache_is_connected = check_redis_connection()
 
-    if not database_is_connected:
+    if not database_is_connected or not cache_is_connected:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={
                 "status": "error",
                 "service": "catalog-service",
-                "database": "unavailable",
+                "database": "ok" if database_is_connected else "unavailable",
+                "cache": "ok" if cache_is_connected else "unavailable",
             },
         )
 
@@ -54,24 +65,46 @@ def health_check() -> HealthResponse:
         status="ok",
         service="catalog-service",
         database="ok",
+        cache="ok",
     )
 
 
 @app.get("/books", response_model=BookListResponse)
 def get_books(
+    response: Response,
     search: str | None = None,
     db: Session = Depends(get_db),
 ) -> BookListResponse:
+    cache_key = build_books_list_cache_key(search)
+    cached_payload = get_json_cache(cache_key)
+
+    if cached_payload is not None:
+        response.headers["X-Cache"] = "HIT"
+        return BookListResponse.model_validate(cached_payload)
+
     books = list_books(db=db, search=search)
     items = [book_to_response(book) for book in books]
-    return BookListResponse(items=items, total=len(items))
+    payload = BookListResponse(items=items, total=len(items))
+
+    set_json_cache(cache_key, payload.model_dump(mode="json"))
+    response.headers["X-Cache"] = "MISS"
+
+    return payload
 
 
 @app.get("/books/{book_id}", response_model=BookResponse)
 def get_book_by_id(
     book_id: int,
+    response: Response,
     db: Session = Depends(get_db),
 ) -> BookResponse:
+    cache_key = build_book_detail_cache_key(book_id)
+    cached_payload = get_json_cache(cache_key)
+
+    if cached_payload is not None:
+        response.headers["X-Cache"] = "HIT"
+        return BookResponse.model_validate(cached_payload)
+
     book = get_book(db=db, book_id=book_id)
 
     if book is None:
@@ -80,7 +113,11 @@ def get_book_by_id(
             detail={"message": "Book not found"},
         )
 
-    return book_to_response(book)
+    payload = book_to_response(book)
+    set_json_cache(cache_key, payload.model_dump(mode="json"))
+    response.headers["X-Cache"] = "MISS"
+
+    return payload
 
 
 @app.post("/books", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
@@ -89,6 +126,7 @@ def create_book_endpoint(
     db: Session = Depends(get_db),
 ) -> BookResponse:
     book = create_book(db=db, data=data)
+    invalidate_books_cache(book_id=book.id)
     return book_to_response(book)
 
 
@@ -107,6 +145,8 @@ def update_book_endpoint(
         )
 
     updated_book = update_book(db=db, book=book, data=data)
+    invalidate_books_cache(book_id=book_id)
+
     return book_to_response(updated_book)
 
 
@@ -124,6 +164,8 @@ def delete_book_endpoint(
         )
 
     delete_book(db=db, book=book)
+    invalidate_books_cache(book_id=book_id)
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
