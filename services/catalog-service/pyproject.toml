@@ -1,0 +1,13 @@
+[project]
+name = "catalog-service"
+version = "0.1.0"
+description = "KitobHub catalog service"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn[standard]==0.34.0"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"

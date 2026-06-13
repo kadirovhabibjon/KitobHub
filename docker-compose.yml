@@ -1,4 +1,20 @@
 services:
+  catalog-service:
+    build:
+      context: ./services/catalog-service
+    container_name: kitobhub-catalog-service
+    env_file:
+      - .env
+    ports:
+      - "8001:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kitobhub-network
+
   postgres:
     image: postgres:16
     container_name: kitobhub-postgres
