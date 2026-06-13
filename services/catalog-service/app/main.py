@@ -1,12 +1,15 @@
 from typing import Literal
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
+
+from app.database import check_database_connection
 
 
 class HealthResponse(BaseModel):
     status: Literal["ok"]
     service: str
+    database: Literal["ok"]
 
 
 app = FastAPI(
@@ -18,4 +21,20 @@ app = FastAPI(
 
 @app.get("/health", response_model=HealthResponse)
 def health_check() -> HealthResponse:
-    return HealthResponse(status="ok", service="catalog-service")
+    database_is_connected = check_database_connection()
+
+    if not database_is_connected:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "status": "error",
+                "service": "catalog-service",
+                "database": "unavailable",
+            },
+        )
+
+    return HealthResponse(
+        status="ok",
+        service="catalog-service",
+        database="ok",
+    )

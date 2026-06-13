@@ -3,6 +3,9 @@ services:
     build:
       context: ./services/catalog-service
     container_name: kitobhub-catalog-service
+    depends_on:
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
     ports:
