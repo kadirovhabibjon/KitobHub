@@ -266,3 +266,42 @@ h1 {
     width: 100%;
   }
 }
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin: 24px 0;
+}
+
+.tool-card {
+  padding: 22px;
+  border: 1px solid #e3e7f2;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(30, 41, 59, 0.08);
+}
+
+.tool-card h2 {
+  margin: 6px 0 14px;
+  font-size: 24px;
+}
+
+.tool-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.tool-card p {
+  margin: 0;
+  color: #697287;
+}
+
+.tool-label {
+  color: #5567ff;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}

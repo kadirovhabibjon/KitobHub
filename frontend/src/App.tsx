@@ -1,11 +1,19 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import './App.css'
-import { createOrder, fetchBooks } from './api'
-import type { Book, Order } from './api'
+import { createOrder, fetchBooks, fetchCurrencyRate, fetchTashkentWeather } from './api'
+import type { Book, CurrencyRate, Order, TashkentWeather } from './api'
 
 function formatPrice(price: string, currency: string) {
   return `${Number(price).toLocaleString('uz-UZ')} ${currency}`
+}
+
+function formatWeatherTime(value: string | null) {
+  if (!value) {
+    return 'Nomaʼlum'
+  }
+
+  return value.replace('T', ' ')
 }
 
 function App() {
@@ -17,6 +25,10 @@ function App() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [lastOrder, setLastOrder] = useState<Order | null>(null)
   const [failedImageIds, setFailedImageIds] = useState<number[]>([])
+  const [currencyRate, setCurrencyRate] = useState<CurrencyRate | null>(null)
+  const [weather, setWeather] = useState<TashkentWeather | null>(null)
+  const [toolsLoading, setToolsLoading] = useState(true)
+  const [toolsError, setToolsError] = useState<string | null>(null)
 
   async function loadBooks(searchValue = search) {
     try {
@@ -32,8 +44,32 @@ function App() {
     }
   }
 
+  async function loadTools() {
+    try {
+      setToolsLoading(true)
+      setToolsError(null)
+
+      const [currencyData, weatherData] = await Promise.all([
+        fetchCurrencyRate('USD'),
+        fetchTashkentWeather(),
+      ])
+
+      setCurrencyRate(currencyData)
+      setWeather(weatherData)
+    } catch (err) {
+      setToolsError(
+        err instanceof Error
+          ? err.message
+          : 'Valyuta va ob-havo maʼlumotlarini yuklashda xatolik',
+      )
+    } finally {
+      setToolsLoading(false)
+    }
+  }
+
   useEffect(() => {
     void loadBooks('')
+    void loadTools()
   }, [])
 
   async function handleSearch(event: FormEvent<HTMLFormElement>) {
@@ -89,6 +125,56 @@ function App() {
           <span>Gateway</span>
           <strong>localhost:8088/api</strong>
         </div>
+      </section>
+
+      <section className="tools-grid">
+        <article className="tool-card">
+          <div>
+            <span className="tool-label">Valyuta integratsiyasi</span>
+            <h2>USD kursi</h2>
+          </div>
+
+          {toolsLoading ? (
+            <p className="muted">Yuklanmoqda...</p>
+          ) : currencyRate ? (
+            <>
+              <strong>
+                {Number(currencyRate.rate_to_uzs).toLocaleString('uz-UZ')} UZS
+              </strong>
+              <p>
+                {currencyRate.currency_name} · {currencyRate.date} ·{' '}
+                {currencyRate.source}
+              </p>
+            </>
+          ) : (
+            <p className="muted">Maʼlumot topilmadi</p>
+          )}
+        </article>
+
+        <article className="tool-card">
+          <div>
+            <span className="tool-label">Ob-havo integratsiyasi</span>
+            <h2>Toshkent</h2>
+          </div>
+
+          {toolsLoading ? (
+            <p className="muted">Yuklanmoqda...</p>
+          ) : weather ? (
+            <>
+              <strong>
+                {weather.temperature} {weather.temperature_unit}
+              </strong>
+              <p>
+                Shamol: {weather.wind_speed} {weather.wind_speed_unit} ·{' '}
+                {formatWeatherTime(weather.time)} · {weather.source}
+              </p>
+            </>
+          ) : (
+            <p className="muted">Maʼlumot topilmadi</p>
+          )}
+        </article>
+
+        {toolsError && <div className="alert alert-error">{toolsError}</div>}
       </section>
 
       <section className="panel">

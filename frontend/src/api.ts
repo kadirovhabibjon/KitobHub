@@ -97,3 +97,33 @@ export async function createOrder(data: CreateOrderRequest): Promise<Order> {
     body: JSON.stringify(data),
   })
 }
+
+export type CurrencyRate = {
+  source: string
+  currency: string
+  currency_name: string
+  rate_to_uzs: string
+  date: string
+}
+
+export type TashkentWeather = {
+  source: string
+  city: string
+  temperature: number | null
+  temperature_unit: string | null
+  wind_speed: number | null
+  wind_speed_unit: string | null
+  time: string | null
+}
+
+export async function fetchCurrencyRate(
+  currency = 'USD',
+): Promise<CurrencyRate> {
+  const params = new URLSearchParams({ currency })
+
+  return request<CurrencyRate>(`/tools/currency/rates?${params.toString()}`)
+}
+
+export async function fetchTashkentWeather(): Promise<TashkentWeather> {
+  return request<TashkentWeather>('/tools/weather/tashkent')
+}
