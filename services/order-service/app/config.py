@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     postgres_port: int = 5432
     order_db_name: str
 
+    catalog_service_url: str = "http://catalog-service:8000"
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property

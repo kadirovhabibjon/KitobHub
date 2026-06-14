@@ -1,9 +1,18 @@
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
-from app.database import check_database_connection
+from app.catalog_client import (
+    CatalogBook,
+    CatalogBookNotFoundError,
+    CatalogServiceUnavailableError,
+    fetch_catalog_book,
+)
+from app.crud import create_order_record, get_order, list_orders, order_to_response
+from app.database import check_database_connection, get_db
+from app.schemas import OrderCreate, OrderListResponse, OrderResponse
 
 
 class HealthResponse(BaseModel):
@@ -38,3 +47,75 @@ def health_check() -> HealthResponse:
         service="order-service",
         database="ok",
     )
+
+
+@app.get("/orders", response_model=OrderListResponse)
+def get_orders(db: Session = Depends(get_db)) -> OrderListResponse:
+    orders = list_orders(db)
+    items = [order_to_response(order) for order in orders]
+    return OrderListResponse(items=items, total=len(items))
+
+
+@app.get("/orders/{order_id}", response_model=OrderResponse)
+def get_order_by_id(
+    order_id: int,
+    db: Session = Depends(get_db),
+) -> OrderResponse:
+    order = get_order(db=db, order_id=order_id)
+
+    if order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "Order not found"},
+        )
+
+    return order_to_response(order)
+
+
+@app.post("/orders", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
+async def create_order_endpoint(
+    data: OrderCreate,
+    db: Session = Depends(get_db),
+) -> OrderResponse:
+    catalog_books: list[CatalogBook] = []
+
+    for item in data.items:
+        try:
+            catalog_book = await fetch_catalog_book(item.book_id)
+        except CatalogBookNotFoundError:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"message": f"Book {item.book_id} not found"},
+            )
+        except CatalogServiceUnavailableError:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={"message": "Catalog service is unavailable"},
+            )
+
+        if catalog_book.stock_quantity < item.quantity:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "message": "Not enough stock",
+                    "book_id": item.book_id,
+                    "available": catalog_book.stock_quantity,
+                    "requested": item.quantity,
+                },
+            )
+
+        catalog_books.append(catalog_book)
+
+    currencies = {book.currency for book in catalog_books}
+    if len(currencies) != 1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "Order items must use the same currency"},
+        )
+
+    order = create_order_record(
+        db=db,
+        data=data,
+        catalog_books=catalog_books,
+    )
+    return order_to_response(order)
