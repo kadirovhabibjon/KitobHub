@@ -1,0 +1,15 @@
+[project]
+name = "tools-service"
+version = "0.1.0"
+description = "KitobHub tools service"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn[standard]==0.34.0",
+    "httpx==0.28.1",
+    "pydantic-settings==2.7.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]

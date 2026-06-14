@@ -137,6 +137,16 @@ services:
       - kitobhub-network
 
 
+
+  tools-service:
+    build:
+      context: ./services/tools-service
+    container_name: kitobhub-tools-service
+    ports:
+      - "8003:8000"
+    networks:
+      - kitobhub-network
+
   nginx-gateway:
     image: nginx:1.27-alpine
     container_name: kitobhub-nginx-gateway
