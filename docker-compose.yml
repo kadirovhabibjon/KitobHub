@@ -103,6 +103,27 @@ services:
     networks:
       - kitobhub-network
 
+  order-service:
+    build:
+      context: ./services/order-service
+    container_name: kitobhub-order-service
+    env_file:
+      - .env
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - kitobhub-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+
 volumes:
   postgres_data:
   redis_data:
