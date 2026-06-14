@@ -210,25 +210,73 @@ Implemented:
 * Local Docker infrastructure
 * Catalog service
 * Order service
+* Tools service
 * Redis caching
 * Kafka event flow
 * Notification worker
 * NGINX API Gateway
 * React frontend
 * Frontend Docker container
+* Currency integration
+* Weather integration
 * Smoke test script
+* Pytest integration tests
+* GitHub Actions CI
 
 Planned improvements:
 
-* Automated tests with pytest
-* GitHub Actions CI
 * Better order status workflow
 * Authentication
 * Payment simulation
 * Real email notification integration
-- Automated tests with pytest
-- GitHub Actions CI
-- Better order status workflow
-- Authentication
-- Payment simulation
-- Real email notification integration
+
+## External Integrations
+
+KitobHub also includes external API integrations through `tools-service`.
+
+### Currency Integration
+
+Currency rates are provided through the Central Bank of Uzbekistan API.
+
+Gateway endpoint:
+
+```http
+GET /api/tools/currency/rates?currency=USD
+```
+
+Example response:
+
+```json
+{
+  "source": "Central Bank of Uzbekistan",
+  "currency": "USD",
+  "rate_to_uzs": "12014.48",
+  "date": "12.06.2026"
+}
+```
+
+### Weather Integration
+
+Tashkent weather data is provided through the Open-Meteo API.
+
+Gateway endpoint:
+
+```http
+GET /api/tools/weather/tashkent
+```
+
+Example response:
+
+```json
+{
+  "source": "Open-Meteo",
+  "city": "Tashkent",
+  "temperature": 34.2,
+  "temperature_unit": "°C"
+}
+```
+
+## Releases
+
+* `v1.0.0` — first complete microservices portfolio release
+* `v1.1.0` — added currency and weather integrations
