@@ -1,5 +1,7 @@
 # KitobHub
 
+[![CI](https://github.com/kadirovhabibjon/KitobHub/actions/workflows/ci.yml/badge.svg)](https://github.com/kadirovhabibjon/KitobHub/actions/workflows/ci.yml)
+
 KitobHub is a microservices-based online bookstore project built for learning and portfolio purposes.
 
 The project demonstrates how a real-world backend system can be structured with separate services, databases, cache, message broker, API gateway, frontend, and worker processes.
