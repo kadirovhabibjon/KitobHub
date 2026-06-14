@@ -10,6 +10,9 @@ class Settings(BaseSettings):
 
     catalog_service_url: str = "http://catalog-service:8000"
 
+    kafka_bootstrap_servers: str = "kafka:9092"
+    order_events_topic: str = "order.created"
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property

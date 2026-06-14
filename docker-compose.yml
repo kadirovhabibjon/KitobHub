@@ -124,6 +124,19 @@ services:
       start_period: 10s
 
 
+  notification-worker:
+    build:
+      context: ./workers/notification-worker
+    container_name: kitobhub-notification-worker
+    env_file:
+      - .env
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - kitobhub-network
+
+
 volumes:
   postgres_data:
   redis_data:

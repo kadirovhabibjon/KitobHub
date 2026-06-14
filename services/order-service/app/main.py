@@ -14,6 +14,7 @@ from app.catalog_client import (
 )
 from app.crud import create_order_record, get_order, list_orders, order_to_response
 from app.database import check_database_connection, get_db
+from app.events import EventPublishError, publish_order_created_event
 from app.schemas import OrderCreate, OrderListResponse, OrderResponse
 
 
@@ -147,4 +148,14 @@ async def create_order_endpoint(
         data=data,
         catalog_books=catalog_books,
     )
-    return order_to_response(order)
+    response = order_to_response(order)
+
+    try:
+        publish_order_created_event(response)
+    except EventPublishError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={"message": "Order event could not be published"},
+        )
+
+    return response
