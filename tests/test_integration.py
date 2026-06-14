@@ -77,3 +77,53 @@ def test_kafka_order_created_topic_exists():
     topics = result.stdout.splitlines()
 
     assert "order.created" in topics
+
+
+def test_tools_health_via_gateway():
+    data = get_json("http://localhost:8088/api/tools/health")
+
+    assert data["status"] == "ok"
+    assert data["service"] == "tools-service"
+
+
+def test_currency_api_via_gateway():
+    data = get_json("http://localhost:8088/api/tools/currency/rates?currency=USD")
+
+    assert data["source"] == "Central Bank of Uzbekistan"
+    assert data["currency"] == "USD"
+    assert "rate_to_uzs" in data
+    assert "date" in data
+
+
+def test_weather_api_via_gateway():
+    data = get_json("http://localhost:8088/api/tools/weather/tashkent")
+
+    assert data["source"] == "Open-Meteo"
+    assert data["city"] == "Tashkent"
+    assert "temperature" in data
+    assert data["temperature_unit"] == "°C"
+
+
+def test_tools_health_via_gateway():
+    data = get_json("http://localhost:8088/api/tools/health")
+
+    assert data["status"] == "ok"
+    assert data["service"] == "tools-service"
+
+
+def test_currency_api_via_gateway():
+    data = get_json("http://localhost:8088/api/tools/currency/rates?currency=USD")
+
+    assert data["source"] == "Central Bank of Uzbekistan"
+    assert data["currency"] == "USD"
+    assert "rate_to_uzs" in data
+    assert "date" in data
+
+
+def test_weather_api_via_gateway():
+    data = get_json("http://localhost:8088/api/tools/weather/tashkent")
+
+    assert data["source"] == "Open-Meteo"
+    assert data["city"] == "Tashkent"
+    assert "temperature" in data
+    assert data["temperature_unit"] == "°C"
