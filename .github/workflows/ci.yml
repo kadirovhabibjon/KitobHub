@@ -24,6 +24,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest
 
+      - name: Create environment file
+        run: |
+          cp .env.example .env
+
       - name: Start Docker Compose stack
         run: |
           docker compose up -d --build
