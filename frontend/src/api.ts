@@ -1,3 +1,6 @@
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8088/api'
+
 export type Book = {
   id: number
   title: string
@@ -17,25 +20,80 @@ export type BookListResponse = {
   total: number
 }
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8001'
+export type OrderItem = {
+  id: number
+  book_id: number
+  book_title: string
+  unit_price: string
+  quantity: number
+  line_total: string
+}
+
+export type Order = {
+  id: number
+  customer_name: string
+  customer_email: string | null
+  status: string
+  total_amount: string
+  currency: string
+  note: string | null
+  created_at: string
+  updated_at: string
+  items: OrderItem[]
+}
+
+export type CreateOrderRequest = {
+  customer_name: string
+  customer_email?: string
+  note?: string
+  items: {
+    book_id: number
+    quantity: number
+  }[]
+}
+
+async function request<T>(
+  path: string,
+  options?: RequestInit,
+): Promise<T> {
+  const headers = new Headers(options?.headers)
+
+  if (options?.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers,
+  })
+
+  if (!response.ok) {
+    const errorPayload = await response.json().catch(() => null)
+    const message =
+      errorPayload?.detail?.message ??
+      errorPayload?.message ??
+      `Request failed with status ${response.status}`
+
+    throw new Error(message)
+  }
+
+  return response.json() as Promise<T>
+}
 
 export async function fetchBooks(search?: string): Promise<BookListResponse> {
   const params = new URLSearchParams()
-  const normalizedSearch = search?.trim()
 
-  if (normalizedSearch) {
-    params.set('search', normalizedSearch)
+  if (search) {
+    params.set('search', search)
   }
 
-  const queryString = params.toString()
-  const url = `${API_BASE_URL}/books${queryString ? `?${queryString}` : ''}`
+  const query = params.toString()
+  return request<BookListResponse>(`/books${query ? `?${query}` : ''}`)
+}
 
-  const response = await fetch(url)
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch books: ${response.status}`)
-  }
-
-  return response.json()
+export async function createOrder(data: CreateOrderRequest): Promise<Order> {
+  return request<Order>('/orders', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
 }
