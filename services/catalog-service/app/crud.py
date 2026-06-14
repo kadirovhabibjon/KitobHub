@@ -154,6 +154,14 @@ def update_book(db: Session, book: Book, data: BookUpdate) -> Book:
     return get_book(db, book.id) or book
 
 
+def decrease_book_stock(db: Session, book: Book, quantity: int) -> Book:
+    book.stock_quantity -= quantity
+    db.commit()
+    db.refresh(book)
+
+    return get_book(db, book.id) or book
+
+
 def delete_book(db: Session, book: Book) -> None:
     db.delete(book)
     db.commit()

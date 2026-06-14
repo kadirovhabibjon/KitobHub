@@ -7,7 +7,9 @@ from sqlalchemy.orm import Session
 from app.catalog_client import (
     CatalogBook,
     CatalogBookNotFoundError,
+    CatalogInsufficientStockError,
     CatalogServiceUnavailableError,
+    decrease_catalog_book_stock,
     fetch_catalog_book,
 )
 from app.crud import create_order_record, get_order, list_orders, order_to_response
@@ -112,6 +114,33 @@ async def create_order_endpoint(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"message": "Order items must use the same currency"},
         )
+
+    for item in data.items:
+        try:
+            await decrease_catalog_book_stock(
+                book_id=item.book_id,
+                quantity=item.quantity,
+            )
+        except CatalogBookNotFoundError:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"message": f"Book {item.book_id} not found"},
+            )
+        except CatalogInsufficientStockError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "message": "Not enough stock",
+                    "book_id": exc.book_id,
+                    "available": exc.available,
+                    "requested": exc.requested,
+                },
+            )
+        except CatalogServiceUnavailableError:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={"message": "Catalog service is unavailable"},
+            )
 
     order = create_order_record(
         db=db,

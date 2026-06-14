@@ -16,6 +16,7 @@ from app.cache import (
 from app.crud import (
     book_to_response,
     create_book,
+    decrease_book_stock,
     delete_book,
     get_book,
     internal_book_to_response,
@@ -29,6 +30,7 @@ from app.schemas import (
     BookResponse,
     BookUpdate,
     InternalBookResponse,
+    StockDecreaseRequest,
 )
 
 
@@ -45,8 +47,6 @@ app = FastAPI(
     version="0.1.0",
 )
 
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -57,6 +57,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/health", response_model=HealthResponse)
 def health_check() -> HealthResponse:
@@ -196,3 +197,38 @@ def get_internal_book_by_id(
         )
 
     return internal_book_to_response(book)
+
+
+@app.post("/internal/books/{book_id}/decrease-stock", response_model=InternalBookResponse)
+def decrease_internal_book_stock(
+    book_id: int,
+    data: StockDecreaseRequest,
+    db: Session = Depends(get_db),
+) -> InternalBookResponse:
+    book = get_book(db=db, book_id=book_id)
+
+    if book is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "Book not found"},
+        )
+
+    if book.stock_quantity < data.quantity:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "message": "Not enough stock",
+                "book_id": book_id,
+                "available": book.stock_quantity,
+                "requested": data.quantity,
+            },
+        )
+
+    updated_book = decrease_book_stock(
+        db=db,
+        book=book,
+        quantity=data.quantity,
+    )
+    invalidate_books_cache(book_id=book_id)
+
+    return internal_book_to_response(updated_book)

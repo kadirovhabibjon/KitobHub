@@ -54,3 +54,7 @@ class InternalBookResponse(BaseModel):
     stock_quantity: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class StockDecreaseRequest(BaseModel):
+    quantity: int = Field(gt=0)
