@@ -305,3 +305,137 @@ h1 {
   font-weight: 800;
   text-transform: uppercase;
 }
+
+.commerce-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.section-title h2 {
+  margin: 0 0 6px;
+}
+
+.section-title p {
+  margin: 0;
+  color: #697287;
+}
+
+.cart-list,
+.order-list {
+  display: grid;
+  gap: 14px;
+}
+
+.cart-item,
+.order-card {
+  padding: 16px;
+  border: 1px solid #e3e7f2;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.cart-item p,
+.order-card p {
+  margin: 6px 0 0;
+  color: #697287;
+}
+
+.quantity-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border-radius: 999px;
+  background: #f1f4ff;
+}
+
+.quantity-control button,
+.link-button {
+  border: 0;
+  cursor: pointer;
+}
+
+.quantity-control button {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  color: #111827;
+  background: #ffffff;
+  font-weight: 800;
+}
+
+.quantity-control button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.quantity-control span {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 800;
+}
+
+.link-button {
+  color: #8a1f1f;
+  background: transparent;
+  font-weight: 700;
+}
+
+.cart-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e3e7f2;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.order-card-header span {
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #43506b;
+  background: #f1f4ff;
+  font-size: 13px;
+}
+
+.order-card ul {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: #697287;
+}
+
+@media (max-width: 900px) {
+  .commerce-grid,
+  .cart-item {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-actions,
+  .section-title {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

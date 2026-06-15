@@ -42,6 +42,11 @@ export type Order = {
   items: OrderItem[]
 }
 
+export type OrderListResponse = {
+  items: Order[]
+  total: number
+}
+
 export type CreateOrderRequest = {
   customer_name: string
   customer_email?: string
@@ -50,6 +55,24 @@ export type CreateOrderRequest = {
     book_id: number
     quantity: number
   }[]
+}
+
+export type CurrencyRate = {
+  source: string
+  currency: string
+  currency_name: string
+  rate_to_uzs: string
+  date: string
+}
+
+export type TashkentWeather = {
+  source: string
+  city: string
+  temperature: number | null
+  temperature_unit: string | null
+  wind_speed: number | null
+  wind_speed_unit: string | null
+  time: string | null
 }
 
 async function request<T>(
@@ -70,9 +93,11 @@ async function request<T>(
   if (!response.ok) {
     const errorPayload = await response.json().catch(() => null)
     const message =
-      errorPayload?.detail?.message ??
-      errorPayload?.message ??
-      `Request failed with status ${response.status}`
+      typeof errorPayload?.detail === 'string'
+        ? errorPayload.detail
+        : errorPayload?.detail?.message ??
+          errorPayload?.message ??
+          `Request failed with status ${response.status}`
 
     throw new Error(message)
   }
@@ -91,29 +116,15 @@ export async function fetchBooks(search?: string): Promise<BookListResponse> {
   return request<BookListResponse>(`/books${query ? `?${query}` : ''}`)
 }
 
+export async function fetchOrders(): Promise<OrderListResponse> {
+  return request<OrderListResponse>('/orders')
+}
+
 export async function createOrder(data: CreateOrderRequest): Promise<Order> {
   return request<Order>('/orders', {
     method: 'POST',
     body: JSON.stringify(data),
   })
-}
-
-export type CurrencyRate = {
-  source: string
-  currency: string
-  currency_name: string
-  rate_to_uzs: string
-  date: string
-}
-
-export type TashkentWeather = {
-  source: string
-  city: string
-  temperature: number | null
-  temperature_unit: string | null
-  wind_speed: number | null
-  wind_speed_unit: string | null
-  time: string | null
 }
 
 export async function fetchCurrencyRate(

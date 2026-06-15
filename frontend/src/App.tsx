@@ -1,11 +1,26 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import './App.css'
-import { createOrder, fetchBooks, fetchCurrencyRate, fetchTashkentWeather } from './api'
+import {
+  createOrder,
+  fetchBooks,
+  fetchCurrencyRate,
+  fetchOrders,
+  fetchTashkentWeather,
+} from './api'
 import type { Book, CurrencyRate, Order, TashkentWeather } from './api'
+
+type CartItem = {
+  book: Book
+  quantity: number
+}
 
 function formatPrice(price: string, currency: string) {
   return `${Number(price).toLocaleString('uz-UZ')} ${currency}`
+}
+
+function formatAmount(amount: number, currency: string) {
+  return `${amount.toLocaleString('uz-UZ')} ${currency}`
 }
 
 function formatWeatherTime(value: string | null) {
@@ -18,9 +33,12 @@ function formatWeatherTime(value: string | null) {
 
 function App() {
   const [books, setBooks] = useState<Book[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
-  const [orderLoadingBookId, setOrderLoadingBookId] = useState<number | null>(null)
+  const [ordersLoading, setOrdersLoading] = useState(true)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [lastOrder, setLastOrder] = useState<Order | null>(null)
@@ -29,6 +47,12 @@ function App() {
   const [weather, setWeather] = useState<TashkentWeather | null>(null)
   const [toolsLoading, setToolsLoading] = useState(true)
   const [toolsError, setToolsError] = useState<string | null>(null)
+
+  const cartTotalAmount = cartItems.reduce(
+    (total, item) => total + Number(item.book.price) * item.quantity,
+    0,
+  )
+  const cartCurrency = cartItems[0]?.book.currency ?? 'UZS'
 
   async function loadBooks(searchValue = search) {
     try {
@@ -41,6 +65,23 @@ function App() {
       setError(err instanceof Error ? err.message : 'Kitoblarni yuklashda xatolik')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadOrders() {
+    try {
+      setOrdersLoading(true)
+
+      const data = await fetchOrders()
+      setOrders(data.items)
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Sotib olingan narsalarni yuklashda xatolik',
+      )
+    } finally {
+      setOrdersLoading(false)
     }
   }
 
@@ -69,6 +110,7 @@ function App() {
 
   useEffect(() => {
     void loadBooks('')
+    void loadOrders()
     void loadTools()
   }, [])
 
@@ -77,9 +119,67 @@ function App() {
     await loadBooks(search)
   }
 
-  async function handleCreateOrder(book: Book) {
+  function handleAddToCart(book: Book) {
+    if (book.stock_quantity <= 0) {
+      setError('Bu kitob hozircha omborda yo‘q')
+      return
+    }
+
+    setError(null)
+    setSuccessMessage(null)
+
+    setCartItems((items) => {
+      const existing = items.find((item) => item.book.id === book.id)
+
+      if (!existing) {
+        return [...items, { book, quantity: 1 }]
+      }
+
+      if (existing.quantity >= book.stock_quantity) {
+        setError('Karzinkadagi miqdor ombordagi miqdordan oshib ketmasligi kerak')
+        return items
+      }
+
+      return items.map((item) =>
+        item.book.id === book.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item,
+      )
+    })
+  }
+
+  function handleChangeCartQuantity(bookId: number, change: number) {
+    setCartItems((items) =>
+      items
+        .map((item) => {
+          if (item.book.id !== bookId) {
+            return item
+          }
+
+          const nextQuantity = item.quantity + change
+          const safeQuantity = Math.min(
+            Math.max(nextQuantity, 0),
+            item.book.stock_quantity,
+          )
+
+          return { ...item, quantity: safeQuantity }
+        })
+        .filter((item) => item.quantity > 0),
+    )
+  }
+
+  function handleRemoveFromCart(bookId: number) {
+    setCartItems((items) => items.filter((item) => item.book.id !== bookId))
+  }
+
+  async function handleCheckout() {
+    if (cartItems.length === 0) {
+      setError('Karzinka bo‘sh')
+      return
+    }
+
     try {
-      setOrderLoadingBookId(book.id)
+      setCheckoutLoading(true)
       setError(null)
       setSuccessMessage(null)
       setLastOrder(null)
@@ -87,25 +187,24 @@ function App() {
       const order = await createOrder({
         customer_name: 'Habibjon Kadirov',
         customer_email: 'habibjon@example.com',
-        note: 'Frontend order test',
-        items: [
-          {
-            book_id: book.id,
-            quantity: 1,
-          },
-        ],
+        note: 'Cart checkout from frontend',
+        items: cartItems.map((item) => ({
+          book_id: item.book.id,
+          quantity: item.quantity,
+        })),
       })
 
       setLastOrder(order)
+      setCartItems([])
       setSuccessMessage(
         `Order #${order.id} yaratildi: ${formatPrice(order.total_amount, order.currency)}`,
       )
 
-      await loadBooks(search)
+      await Promise.all([loadBooks(search), loadOrders()])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Order yaratishda xatolik')
     } finally {
-      setOrderLoadingBookId(null)
+      setCheckoutLoading(false)
     }
   }
 
@@ -116,7 +215,7 @@ function App() {
           <p className="eyebrow">KitobHub</p>
           <h1>Onlayn kitob do‘koni</h1>
           <p className="subtitle">
-            React frontend endi NGINX API Gateway orqali catalog va order
+            React frontend NGINX API Gateway orqali catalog, order va tools
             service bilan ishlayapti.
           </p>
         </div>
@@ -181,7 +280,7 @@ function App() {
         <div className="panel-header">
           <div>
             <h2>Kitoblar</h2>
-            <p>Kitobni tanlang va frontend orqali order yarating.</p>
+            <p>Kitobni tanlang va karzinkaga qo‘shing.</p>
           </div>
 
           <form className="search-form" onSubmit={handleSearch}>
@@ -231,7 +330,7 @@ function App() {
                 <div className="book-content">
                   <p className="category">{book.category_name}</p>
                   <h3>{book.title}</h3>
-                  <p className="description">{book.description}</p>
+                  <p className="description">{book.description ?? 'Tavsif yo‘q'}</p>
 
                   <div className="meta">
                     <span>{book.author_name}</span>
@@ -242,14 +341,10 @@ function App() {
                     <strong>{formatPrice(book.price, book.currency)}</strong>
                     <button
                       type="button"
-                      onClick={() => void handleCreateOrder(book)}
-                      disabled={
-                        book.stock_quantity <= 0 || orderLoadingBookId === book.id
-                      }
+                      onClick={() => handleAddToCart(book)}
+                      disabled={book.stock_quantity <= 0}
                     >
-                      {orderLoadingBookId === book.id
-                        ? 'Yaratilmoqda...'
-                        : 'Buyurtma berish'}
+                      {book.stock_quantity <= 0 ? 'Tugagan' : 'Karzinkaga qo‘shish'}
                     </button>
                   </div>
                 </div>
@@ -257,6 +352,108 @@ function App() {
             ))}
           </div>
         )}
+      </section>
+
+      <section className="commerce-grid">
+        <article className="panel">
+          <div className="section-title">
+            <div>
+              <h2>Karzinka</h2>
+              <p>Sotib olmoqchi bo‘lgan kitoblaringiz shu yerda turadi.</p>
+            </div>
+            <strong>{cartItems.length} ta mahsulot</strong>
+          </div>
+
+          {cartItems.length === 0 ? (
+            <p className="muted">Karzinka hozircha bo‘sh.</p>
+          ) : (
+            <>
+              <div className="cart-list">
+                {cartItems.map((item) => (
+                  <div className="cart-item" key={item.book.id}>
+                    <div>
+                      <strong>{item.book.title}</strong>
+                      <p>
+                        {formatPrice(item.book.price, item.book.currency)} · Stock:{' '}
+                        {item.book.stock_quantity}
+                      </p>
+                    </div>
+
+                    <div className="quantity-control">
+                      <button
+                        type="button"
+                        onClick={() => handleChangeCartQuantity(item.book.id, -1)}
+                      >
+                        -
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeCartQuantity(item.book.id, 1)}
+                        disabled={item.quantity >= item.book.stock_quantity}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      className="link-button"
+                      type="button"
+                      onClick={() => handleRemoveFromCart(item.book.id)}
+                    >
+                      O‘chirish
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="cart-actions">
+                <strong>Jami: {formatAmount(cartTotalAmount, cartCurrency)}</strong>
+                <button
+                  type="button"
+                  onClick={() => void handleCheckout()}
+                  disabled={checkoutLoading}
+                >
+                  {checkoutLoading ? 'Sotib olinmoqda...' : 'Sotib olish'}
+                </button>
+              </div>
+            </>
+          )}
+        </article>
+
+        <article className="panel">
+          <div className="section-title">
+            <div>
+              <h2>Sotib olinganlar</h2>
+              <p>Oxirgi yaratilgan orderlar.</p>
+            </div>
+          </div>
+
+          {ordersLoading ? (
+            <p className="muted">Yuklanmoqda...</p>
+          ) : orders.length === 0 ? (
+            <p className="muted">Hali orderlar yo‘q.</p>
+          ) : (
+            <div className="order-list">
+              {orders.slice(0, 5).map((order) => (
+                <div className="order-card" key={order.id}>
+                  <div className="order-card-header">
+                    <strong>Order #{order.id}</strong>
+                    <span>{order.status}</span>
+                  </div>
+                  <p>{formatPrice(order.total_amount, order.currency)}</p>
+                  <ul>
+                    {order.items.map((item) => (
+                      <li key={item.id}>
+                        {item.book_title} × {item.quantity}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+        </article>
       </section>
     </main>
   )
