@@ -15,7 +15,7 @@ type CartItem = {
   quantity: number
 }
 
-type Page = 'home' | 'cart' | 'orders'
+type Page = 'home' | 'book-detail' | 'cart' | 'orders'
 type OrderFormSource = 'buy-now' | 'cart' | null
 type PaymentMethod = 'cash' | 'card'
 
@@ -96,6 +96,7 @@ function App() {
   const [orders, setOrders] = useState<Order[]>([])
   const [visibleOrderIds, setVisibleOrderIds] = useState<number[]>(() => readVisibleOrderIds())
   const [cartItems, setCartItems] = useState<CartItem[]>([])
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null)
 
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -213,9 +214,24 @@ function App() {
     await loadBooks(search)
   }
 
+  function handleOpenBookDetail(book: Book) {
+    setSelectedBook(book)
+    setError(null)
+    setSuccessMessage(null)
+    setActivePage('book-detail')
+  }
+
+  function handleBackToBooks() {
+    setSelectedBook(null)
+    setError(null)
+    setSuccessMessage(null)
+    setActivePage('home')
+  }
+
   function goToPage(page: Page) {
     setError(null)
     setSuccessMessage(null)
+    setSelectedBook(null)
     setActivePage(page)
 
     if (page === 'orders') {
@@ -479,7 +495,19 @@ function App() {
           ) : (
             <div className="book-grid">
               {books.map((book) => (
-                <article className="book-card" key={book.id}>
+                <article
+                  className="book-card clickable-book-card"
+                  key={book.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleOpenBookDetail(book)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      handleOpenBookDetail(book)
+                    }
+                  }}
+                >
                   <div className="book-cover">
                     {book.image_url && !failedImageIds.includes(book.id) ? (
                       <img
@@ -513,7 +541,10 @@ function App() {
                         <button
                           className="buy-now-button"
                           type="button"
-                          onClick={() => handleBuyNow(book)}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            handleBuyNow(book)
+                          }}
                           disabled={book.stock_quantity <= 0 || orderLoading}
                         >
                           {book.stock_quantity <= 0
@@ -524,7 +555,10 @@ function App() {
                         <button
                           className="cart-icon-button"
                           type="button"
-                          onClick={() => handleAddToCart(book)}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            handleAddToCart(book)
+                          }}
                           disabled={book.stock_quantity <= 0}
                           title="Savatchaga qo‘shish"
                         >
@@ -539,6 +573,99 @@ function App() {
           )}
         </section>
       </>
+    )
+  }
+
+  function renderBookDetailPage() {
+    if (!selectedBook) {
+      return (
+        <section className="panel">
+          <div className="empty-state">
+            <h3>Kitob tanlanmagan</h3>
+            <p>Kitoblar bo‘limiga qaytib, biror kitobni tanlang.</p>
+            <button type="button" onClick={handleBackToBooks}>
+              Kitoblarga qaytish
+            </button>
+          </div>
+        </section>
+      )
+    }
+
+    const book = selectedBook
+
+    return (
+      <section className="panel detail-panel">
+        <button className="back-button" type="button" onClick={handleBackToBooks}>
+          ← Kitoblarga qaytish
+        </button>
+
+        <div className="book-detail-layout">
+          <div className="book-detail-cover">
+            {book.image_url && !failedImageIds.includes(book.id) ? (
+              <img
+                src={book.image_url}
+                alt={book.title}
+                onError={() =>
+                  setFailedImageIds((ids) =>
+                    ids.includes(book.id) ? ids : [...ids, book.id],
+                  )
+                }
+              />
+            ) : (
+              <span>{book.title.slice(0, 2).toUpperCase()}</span>
+            )}
+          </div>
+
+          <div className="book-detail-content">
+            <p className="category">{book.category_name}</p>
+            <h2>{book.title}</h2>
+
+            <p className="book-detail-author">
+              Muallif: <strong>{book.author_name}</strong>
+            </p>
+
+            <p className="book-detail-description">
+              {book.description ?? 'Bu kitob uchun tavsif hali kiritilmagan.'}
+            </p>
+
+            <div className="detail-stats">
+              <div>
+                <span>Narx</span>
+                <strong>{formatPrice(book.price, book.currency)}</strong>
+              </div>
+
+              <div>
+                <span>Omborda</span>
+                <strong>{book.stock_quantity} ta</strong>
+              </div>
+
+              <div>
+                <span>Kategoriya</span>
+                <strong>{book.category_name}</strong>
+              </div>
+            </div>
+
+            <div className="detail-actions">
+              <button
+                type="button"
+                onClick={() => handleBuyNow(book)}
+                disabled={book.stock_quantity <= 0 || orderLoading}
+              >
+                {book.stock_quantity <= 0 ? 'Tugagan' : 'Hoziroq xarid qilish'}
+              </button>
+
+              <button
+                className="detail-cart-button"
+                type="button"
+                onClick={() => handleAddToCart(book)}
+                disabled={book.stock_quantity <= 0}
+              >
+                🛒 Savatchaga qo‘shish
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
     )
   }
 
@@ -706,7 +833,7 @@ function App() {
 
       <nav className="shop-nav">
         <button
-          className={activePage === 'home' ? 'active' : ''}
+          className={activePage === 'home' || activePage === 'book-detail' ? 'active' : ''}
           type="button"
           onClick={() => goToPage('home')}
         >
@@ -847,6 +974,7 @@ function App() {
       )}
 
       {activePage === 'home' && renderBooksPage()}
+      {activePage === 'book-detail' && renderBookDetailPage()}
       {activePage === 'cart' && renderCartPage()}
       {activePage === 'orders' && renderOrdersPage()}
     </main>

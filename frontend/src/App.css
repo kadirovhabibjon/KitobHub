@@ -639,3 +639,141 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* book-detail-flow-v1 */
+
+.clickable-book-card {
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.clickable-book-card:hover {
+  transform: translateY(-4px);
+  border-color: #c7d2fe;
+  box-shadow: 0 20px 55px rgba(30, 41, 59, 0.12);
+}
+
+.detail-panel {
+  padding: 28px;
+}
+
+.back-button {
+  margin-bottom: 20px;
+  color: #111827;
+  background: #eef2ff;
+}
+
+.book-detail-layout {
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.book-detail-cover {
+  display: grid;
+  place-items: center;
+  min-height: 520px;
+  overflow: hidden;
+  border-radius: 26px;
+  background: linear-gradient(135deg, #eef2ff, #f8f0ff);
+}
+
+.book-detail-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-detail-cover span {
+  color: #5567ff;
+  font-size: 78px;
+  font-weight: 900;
+}
+
+.book-detail-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.book-detail-content h2 {
+  margin: 0;
+  max-width: 640px;
+  font-size: clamp(42px, 6vw, 72px);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.book-detail-author {
+  margin: 18px 0 0;
+  color: #697287;
+  font-size: 18px;
+}
+
+.book-detail-description {
+  max-width: 720px;
+  margin: 22px 0;
+  color: #43506b;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.detail-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 10px 0 24px;
+}
+
+.detail-stats div {
+  padding: 18px;
+  border: 1px solid #e3e7f2;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.detail-stats span {
+  display: block;
+  margin-bottom: 8px;
+  color: #697287;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.detail-stats strong {
+  font-size: 20px;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.detail-cart-button {
+  color: #ffffff;
+  background: #00b894;
+}
+
+@media (max-width: 900px) {
+  .book-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .book-detail-cover {
+    min-height: 360px;
+  }
+
+  .detail-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-actions {
+    display: grid;
+  }
+}
