@@ -15,7 +15,7 @@ type CartItem = {
   quantity: number
 }
 
-type Page = 'home' | 'book-detail' | 'cart' | 'orders'
+type Page = 'home' | 'book-detail' | 'favorites' | 'cart' | 'orders'
 type OrderFormSource = 'buy-now' | 'cart' | null
 type PaymentMethod = 'cash' | 'card'
 type StockFilter = 'all' | 'available'
@@ -92,6 +92,39 @@ function saveVisibleOrderIds(ids: number[]) {
   }
 }
 
+const FAVORITE_BOOK_IDS_STORAGE_KEY = 'kitobhub-favorite-book-ids'
+
+function readFavoriteBookIds() {
+  try {
+    const rawValue = window.localStorage.getItem(FAVORITE_BOOK_IDS_STORAGE_KEY)
+
+    if (!rawValue) {
+      return []
+    }
+
+    const parsedValue = JSON.parse(rawValue)
+
+    if (!Array.isArray(parsedValue)) {
+      return []
+    }
+
+    return parsedValue.filter((value): value is number => typeof value === 'number')
+  } catch {
+    return []
+  }
+}
+
+function saveFavoriteBookIds(ids: number[]) {
+  try {
+    window.localStorage.setItem(
+      FAVORITE_BOOK_IDS_STORAGE_KEY,
+      JSON.stringify(ids),
+    )
+  } catch {
+    // localStorage ishlamasa ham app to‘xtab qolmasin
+  }
+}
+
 function App() {
   const [activePage, setActivePage] = useState<Page>('home')
   const [books, setBooks] = useState<Book[]>([])
@@ -99,6 +132,7 @@ function App() {
   const [visibleOrderIds, setVisibleOrderIds] = useState<number[]>(() => readVisibleOrderIds())
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
+  const [favoriteBookIds, setFavoriteBookIds] = useState<number[]>(() => readFavoriteBookIds())
 
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
@@ -183,6 +217,12 @@ function App() {
     })
   }, [books, categoryFilter, stockFilter, sortOption])
 
+  const favoriteBooks = useMemo(() => {
+    const favoriteIdSet = new Set(favoriteBookIds)
+
+    return books.filter((book) => favoriteIdSet.has(book.id))
+  }, [books, favoriteBookIds])
+
   async function loadBooks(searchValue = search) {
     try {
       setLoading(true)
@@ -247,10 +287,32 @@ function App() {
     saveVisibleOrderIds(visibleOrderIds)
   }, [visibleOrderIds])
 
+  useEffect(() => {
+    saveFavoriteBookIds(favoriteBookIds)
+  }, [favoriteBookIds])
+
   async function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setActivePage('home')
     await loadBooks(search)
+  }
+
+  function isBookFavorite(bookId: number) {
+    return favoriteBookIds.includes(bookId)
+  }
+
+  function handleToggleFavorite(book: Book) {
+    setError(null)
+
+    setFavoriteBookIds((ids) => {
+      if (ids.includes(book.id)) {
+        setSuccessMessage(`${book.title} sevimlilardan olib tashlandi`)
+        return ids.filter((id) => id !== book.id)
+      }
+
+      setSuccessMessage(`${book.title} sevimlilarga qo‘shildi`)
+      return [book.id, ...ids]
+    })
   }
 
   function handleOpenBookDetail(book: Book) {
@@ -596,6 +658,22 @@ function App() {
                     }
                   }}
                 >
+                  <button
+                    className={`favorite-button ${isBookFavorite(book.id) ? 'active' : ''}`}
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      handleToggleFavorite(book)
+                    }}
+                    title={
+                      isBookFavorite(book.id)
+                        ? 'Sevimlilardan olib tashlash'
+                        : 'Sevimlilarga qo‘shish'
+                    }
+                  >
+                    {isBookFavorite(book.id) ? '♥' : '♡'}
+                  </button>
+
                   <div className="book-cover">
                     {book.image_url && !failedImageIds.includes(book.id) ? (
                       <img
@@ -750,9 +828,104 @@ function App() {
               >
                 🛒 Savatchaga qo‘shish
               </button>
+
+              <button
+                className={`detail-favorite-button ${isBookFavorite(book.id) ? 'active' : ''}`}
+                type="button"
+                onClick={() => handleToggleFavorite(book)}
+              >
+                {isBookFavorite(book.id)
+                  ? '♥ Sevimlilardan olish'
+                  : '♡ Sevimlilarga qo‘shish'}
+              </button>
             </div>
           </div>
         </div>
+      </section>
+    )
+  }
+
+  function renderFavoritesPage() {
+    return (
+      <section className="panel">
+        <div className="page-title">
+          <div>
+            <p className="eyebrow">Sevimlilar</p>
+            <h2>Yoqtirgan kitoblar</h2>
+            <p>Yurakcha bosilgan kitoblar shu yerda saqlanadi.</p>
+          </div>
+          <strong>{favoriteBooks.length} ta kitob</strong>
+        </div>
+
+        {favoriteBooks.length === 0 ? (
+          <div className="empty-state">
+            <h3>Sevimlilar hali bo‘sh</h3>
+            <p>Kitoblar bo‘limiga qaytib, yurakcha orqali kitob qo‘shing.</p>
+            <button type="button" onClick={() => goToPage('home')}>
+              Kitoblarga qaytish
+            </button>
+          </div>
+        ) : (
+          <div className="favorites-list">
+            {favoriteBooks.map((book) => (
+              <article className="favorite-card" key={book.id}>
+                <div className="favorite-card-cover">
+                  {book.image_url && !failedImageIds.includes(book.id) ? (
+                    <img
+                      src={book.image_url}
+                      alt={book.title}
+                      onError={() =>
+                        setFailedImageIds((ids) =>
+                          ids.includes(book.id) ? ids : [...ids, book.id],
+                        )
+                      }
+                    />
+                  ) : (
+                    <span>{book.title.slice(0, 2).toUpperCase()}</span>
+                  )}
+                </div>
+
+                <div>
+                  <p className="category">{book.category_name}</p>
+                  <h3>{book.title}</h3>
+                  <p>{book.author_name}</p>
+                  <strong>{formatPrice(book.price, book.currency)}</strong>
+                </div>
+
+                <div className="favorite-card-actions">
+                  <button type="button" onClick={() => handleOpenBookDetail(book)}>
+                    Batafsil
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleBuyNow(book)}
+                    disabled={book.stock_quantity <= 0 || orderLoading}
+                  >
+                    Xarid qilish
+                  </button>
+
+                  <button
+                    className="detail-cart-button"
+                    type="button"
+                    onClick={() => handleAddToCart(book)}
+                    disabled={book.stock_quantity <= 0}
+                  >
+                    🛒 Savatcha
+                  </button>
+
+                  <button
+                    className="remove-favorite-button"
+                    type="button"
+                    onClick={() => handleToggleFavorite(book)}
+                  >
+                    ♥ Olib tashlash
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
     )
   }
@@ -936,6 +1109,14 @@ function App() {
           🛒 Savatcha <span>{cartTotalQuantity}</span>
         </button>
 
+        <button
+          className={activePage === 'favorites' ? 'active' : ''}
+          type="button"
+          onClick={() => goToPage('favorites')}
+        >
+          ♥ Sevimlilar <span>{favoriteBookIds.length}</span>
+        </button>
+
         {shouldShowOrdersNav && (
           <button
             className={activePage === 'orders' ? 'active' : ''}
@@ -1063,6 +1244,7 @@ function App() {
 
       {activePage === 'home' && renderBooksPage()}
       {activePage === 'book-detail' && renderBookDetailPage()}
+      {activePage === 'favorites' && renderFavoritesPage()}
       {activePage === 'cart' && renderCartPage()}
       {activePage === 'orders' && renderOrdersPage()}
     </main>
