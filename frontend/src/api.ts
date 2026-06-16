@@ -194,3 +194,58 @@ export async function updateOrderStatus(
     body: JSON.stringify({ status }),
   })
 }
+
+
+export type UserRole = 'customer' | 'admin'
+
+export type AuthUser = {
+  id: number
+  full_name: string
+  email: string
+  role: UserRole
+}
+
+export type AuthResponse = {
+  access_token: string
+  token_type: 'bearer'
+  user: AuthUser
+}
+
+export type RegisterRequest = {
+  full_name: string
+  email: string
+  password: string
+}
+
+export type LoginRequest = {
+  email: string
+  password: string
+}
+
+export async function registerUser(data: RegisterRequest): Promise<AuthResponse> {
+  return request<AuthResponse>('/auth/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+}
+
+export async function loginUser(data: LoginRequest): Promise<AuthResponse> {
+  return request<AuthResponse>('/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+}
+
+export async function fetchCurrentUser(token: string): Promise<AuthUser> {
+  return request<AuthUser>('/auth/me', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+}

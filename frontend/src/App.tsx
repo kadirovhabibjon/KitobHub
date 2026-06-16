@@ -9,21 +9,40 @@ import {
   fetchCurrencyRate,
   fetchOrders,
   fetchTashkentWeather,
+  fetchCurrentUser,
+  loginUser,
+  registerUser,
   updateBook,
   updateOrderStatus,
 } from './api'
-import type { Book, BookPayload, CurrencyRate, Order, OrderStatus, TashkentWeather } from './api'
+import type { AuthUser, Book, BookPayload, CurrencyRate, Order, OrderStatus, TashkentWeather } from './api'
 
 type CartItem = {
   book: Book
   quantity: number
 }
 
-type Page = 'home' | 'book-detail' | 'favorites' | 'cart' | 'orders' | 'admin'
+type Page = 'home' | 'book-detail' | 'favorites' | 'cart' | 'orders' | 'admin' | 'auth'
 type OrderFormSource = 'buy-now' | 'cart' | null
+type AuthMode = 'login' | 'register'
+
 type PaymentMethod = 'cash' | 'card'
 type StockFilter = 'all' | 'available'
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'title-asc'
+
+type AuthForm = {
+  full_name: string
+  email: string
+  password: string
+}
+
+const AUTH_TOKEN_STORAGE_KEY = 'kitobhub_auth_token'
+
+const emptyAuthForm: AuthForm = {
+  full_name: '',
+  email: '',
+  password: '',
+}
 
 type AdminBookForm = {
   title: string
@@ -181,6 +200,14 @@ function saveFavoriteBookIds(ids: number[]) {
 
 function App() {
   const [activePage, setActivePage] = useState<Page>('home')
+  const [authMode, setAuthMode] = useState<AuthMode>('login')
+  const [authForm, setAuthForm] = useState<AuthForm>(emptyAuthForm)
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null)
+  const [authToken, setAuthToken] = useState<string | null>(() =>
+    localStorage.getItem(AUTH_TOKEN_STORAGE_KEY),
+  )
+  const [authLoading, setAuthLoading] = useState(false)
+  const isAdmin = authUser?.role === 'admin'
   const [books, setBooks] = useState<Book[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [visibleOrderIds, setVisibleOrderIds] = useState<number[]>(() => readVisibleOrderIds())
@@ -387,7 +414,24 @@ function App() {
     setActivePage('home')
   }
 
+
+  useEffect(() => {
+    if (!authToken) {
+      setAuthUser(null)
+      return
+    }
+
+    void restoreAuthUser(authToken)
+  }, [authToken])
+
   function goToPage(page: Page) {
+    if (page === 'admin' && !isAdmin) {
+      setAuthMode('login')
+      setActivePage('auth')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+
     setError(null)
     setSuccessMessage(null)
     setSelectedBook(null)
@@ -829,6 +873,191 @@ function App() {
     } finally {
       setAdminLoading(false)
     }
+  }
+
+  async function restoreAuthUser(token: string) {
+    try {
+      const user = await fetchCurrentUser(token)
+      setAuthUser(user)
+    } catch {
+      localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)
+      setAuthToken(null)
+      setAuthUser(null)
+    }
+  }
+
+  function handleAuthFieldChange(
+    field: keyof AuthForm,
+    value: string,
+  ) {
+    setAuthForm((currentForm) => ({
+      ...currentForm,
+      [field]: value,
+    }))
+  }
+
+  function switchAuthMode(mode: AuthMode) {
+    setAuthMode(mode)
+    setAuthForm(emptyAuthForm)
+    setError(null)
+    setSuccessMessage(null)
+  }
+
+  async function handleAuthSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    try {
+      setAuthLoading(true)
+      setError(null)
+      setSuccessMessage(null)
+
+      const response =
+        authMode === 'login'
+          ? await loginUser({
+              email: authForm.email,
+              password: authForm.password,
+            })
+          : await registerUser({
+              full_name: authForm.full_name,
+              email: authForm.email,
+              password: authForm.password,
+            })
+
+      localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, response.access_token)
+      setAuthToken(response.access_token)
+      setAuthUser(response.user)
+      setAuthForm(emptyAuthForm)
+
+      setSuccessMessage(
+        response.user.role === 'admin'
+          ? 'Admin sifatida tizimga kirdingiz'
+          : 'Tizimga muvaffaqiyatli kirdingiz',
+      )
+
+      setActivePage(response.user.role === 'admin' ? 'admin' : 'home')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Tizimga kirishda xatolik yuz berdi',
+      )
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)
+    setAuthToken(null)
+    setAuthUser(null)
+    setSuccessMessage('Tizimdan chiqdingiz')
+    setError(null)
+
+    if (activePage === 'admin') {
+      setActivePage('home')
+    }
+  }
+
+  function renderAuthPage() {
+    const isRegisterMode = authMode === 'register'
+
+    return (
+      <section className="auth-page">
+        <div className="auth-card">
+          <div className="section-eyebrow">ACCOUNT</div>
+          <h2>{isRegisterMode ? 'Ro‘yxatdan o‘tish' : 'Tizimga kirish'}</h2>
+          <p>
+            {isRegisterMode
+              ? 'Yangi account yarating. Birinchi yaratilgan user admin bo‘ladi.'
+              : 'Admin panel va buyurtmalarni boshqarish uchun login qiling.'}
+          </p>
+
+          <div className="auth-tabs">
+            <button
+              type="button"
+              className={!isRegisterMode ? 'active' : ''}
+              onClick={() => switchAuthMode('login')}
+            >
+              Kirish
+            </button>
+
+
+            <button
+              type="button"
+              className={isRegisterMode ? 'active' : ''}
+              onClick={() => switchAuthMode('register')}
+            >
+              Ro‘yxatdan o‘tish
+            </button>
+          </div>
+
+          <form className="auth-form" onSubmit={handleAuthSubmit}>
+            {isRegisterMode && (
+              <label>
+                <span>Ism familiya</span>
+                <input
+                  value={authForm.full_name}
+                  onChange={(event) =>
+                    handleAuthFieldChange('full_name', event.target.value)
+                  }
+                  placeholder="Habibjon Kadirov"
+                  minLength={2}
+                  required
+                />
+              </label>
+            )}
+
+            <label>
+              <span>Email</span>
+              <input
+                value={authForm.email}
+                onChange={(event) =>
+                  handleAuthFieldChange('email', event.target.value)
+                }
+                placeholder="habibjonkadirovv@gmail.com"
+                type="email"
+                required
+              />
+            </label>
+
+            <label>
+              <span>Parol</span>
+              <input
+                value={authForm.password}
+                onChange={(event) =>
+                  handleAuthFieldChange('password', event.target.value)
+                }
+                placeholder="Kamida 6 ta belgi"
+                type="password"
+                minLength={6}
+                required
+              />
+            </label>
+
+            <button type="submit" className="primary-button" disabled={authLoading}>
+              {authLoading
+                ? 'Yuborilmoqda...'
+                : isRegisterMode
+                  ? 'Account yaratish'
+                  : 'Kirish'}
+            </button>
+          </form>
+        </div>
+
+        <div className="auth-info-card">
+          <h3>Demo admin</h3>
+          <p>
+            Siz yaratgan birinchi user admin:
+            <strong> habibjonkadirovv@gmail.com</strong>
+          </p>
+          <p>
+            Login qilingandan keyin yuqorida <strong>Admin</strong> tugmasi
+            faqat admin userga ko‘rinadi.
+          </p>
+        </div>
+      </section>
+    )
   }
 
   function renderAdminPage() {
@@ -1613,14 +1842,6 @@ function App() {
           ♥ Sevimlilar <span>{favoriteBookIds.length}</span>
         </button>
 
-        <button
-          className={activePage === 'admin' ? 'active' : ''}
-          type="button"
-          onClick={() => goToPage('admin')}
-        >
-          Admin
-        </button>
-
         {shouldShowOrdersNav && (
           <button
             className={activePage === 'orders' ? 'active' : ''}
@@ -1630,7 +1851,34 @@ function App() {
             Buyurtmalar
           </button>
         )}
-      </nav>
+      
+
+            {isAdmin && (
+              <button
+                className={activePage === 'admin' ? 'active' : ''}
+                onClick={() => goToPage('admin')}
+              >
+                Admin
+              </button>
+            )}
+
+            {authUser ? (
+              <div className="auth-user-chip">
+                <span>{authUser.full_name}</span>
+                <small>{authUser.role === 'admin' ? 'Admin' : 'User'}</small>
+                <button type="button" onClick={handleLogout}>
+                  Chiqish
+                </button>
+              </div>
+            ) : (
+              <button
+                className={activePage === 'auth' ? 'active' : ''}
+                onClick={() => goToPage('auth')}
+              >
+                Kirish
+              </button>
+            )}
+</nav>
 
       {error && <div className="alert alert-error global-alert">{error}</div>}
 
@@ -1751,7 +1999,8 @@ function App() {
       {activePage === 'favorites' && renderFavoritesPage()}
       {activePage === 'cart' && renderCartPage()}
       {activePage === 'orders' && renderOrdersPage()}
-      {activePage === 'admin' && renderAdminPage()}
+      {activePage === 'auth' && renderAuthPage()}
+        {activePage === 'admin' && renderAdminPage()}
     </main>
   )
 }
