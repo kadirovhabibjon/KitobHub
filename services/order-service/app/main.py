@@ -12,10 +12,10 @@ from app.catalog_client import (
     decrease_catalog_book_stock,
     fetch_catalog_book,
 )
-from app.crud import create_order_record, get_order, list_orders, order_to_response
+from app.crud import create_order_record, get_order, list_orders, order_to_response, update_order_status
 from app.database import check_database_connection, get_db
 from app.events import EventPublishError, publish_order_created_event
-from app.schemas import OrderCreate, OrderListResponse, OrderResponse
+from app.schemas import OrderCreate, OrderListResponse, OrderResponse, OrderStatusUpdate
 
 
 class HealthResponse(BaseModel):
@@ -65,6 +65,33 @@ def get_order_by_id(
     db: Session = Depends(get_db),
 ) -> OrderResponse:
     order = get_order(db=db, order_id=order_id)
+
+    if order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "Order not found"},
+        )
+
+    return order_to_response(order)
+
+
+@app.put("/orders/{order_id}/status", response_model=OrderResponse)
+def update_order_status_endpoint(
+    order_id: int,
+    data: OrderStatusUpdate,
+    db: Session = Depends(get_db),
+) -> OrderResponse:
+    try:
+        order = update_order_status(
+            db=db,
+            order_id=order_id,
+            new_status=data.status,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": str(exc)},
+        ) from exc
 
     if order is None:
         raise HTTPException(

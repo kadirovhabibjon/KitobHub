@@ -183,7 +183,7 @@ export async function fetchTashkentWeather(): Promise<TashkentWeather> {
   return request<TashkentWeather>('/tools/weather/tashkent')
 }
 
-export type OrderStatus = 'pending' | 'confirmed' | 'delivered' | 'cancelled'
+export type OrderStatus = 'pending' | 'accepted' | 'shipping' | 'delivered' | 'cancelled'
 
 export async function updateOrderStatus(
   orderId: number,

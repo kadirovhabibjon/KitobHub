@@ -24,7 +24,7 @@ class OrderCreate(BaseModel):
 
 
 class OrderStatusUpdate(BaseModel):
-    status: Literal["pending", "confirmed", "delivered", "cancelled"]
+    status: Literal["pending", "accepted", "shipping", "delivered", "cancelled"]
 
 
 class OrderItemResponse(BaseModel):

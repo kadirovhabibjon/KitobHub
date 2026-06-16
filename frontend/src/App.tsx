@@ -10,8 +10,9 @@ import {
   fetchOrders,
   fetchTashkentWeather,
   updateBook,
+  updateOrderStatus,
 } from './api'
-import type { Book, BookPayload, CurrencyRate, Order, TashkentWeather } from './api'
+import type { Book, BookPayload, CurrencyRate, Order, OrderStatus, TashkentWeather } from './api'
 
 type CartItem = {
   book: Book
@@ -65,12 +66,40 @@ function formatWeatherTime(value: string | null) {
 function formatOrderStatus(status: string) {
   const labels: Record<string, string> = {
     pending: 'Kutilmoqda',
+    accepted: 'Qabul qilindi',
     confirmed: 'Tasdiqlandi',
+    shipping: 'Yetkazilmoqda',
     delivered: 'Yetkazildi',
     cancelled: 'Bekor qilindi',
   }
 
   return labels[status] ?? status
+}
+
+function getOrderStatusOptions(status: string): { value: OrderStatus; label: string }[] {
+  const currentStatus = status as OrderStatus
+
+  const optionsByStatus: Record<OrderStatus, { value: OrderStatus; label: string }[]> = {
+    pending: [
+      { value: 'pending', label: 'Kutilmoqda' },
+      { value: 'accepted', label: 'Qabul qilindi' },
+      { value: 'cancelled', label: 'Bekor qilindi' },
+    ],
+    accepted: [
+      { value: 'accepted', label: 'Qabul qilindi' },
+      { value: 'shipping', label: 'Yetkazilmoqda' },
+      { value: 'cancelled', label: 'Bekor qilindi' },
+    ],
+    shipping: [
+      { value: 'shipping', label: 'Yetkazilmoqda' },
+      { value: 'delivered', label: 'Yetkazildi' },
+      { value: 'cancelled', label: 'Bekor qilindi' },
+    ],
+    delivered: [{ value: 'delivered', label: 'Yetkazildi' }],
+    cancelled: [{ value: 'cancelled', label: 'Bekor qilindi' }],
+  }
+
+  return optionsByStatus[currentStatus] ?? optionsByStatus.pending
 }
 
 function formatPaymentMethod(method: PaymentMethod) {
@@ -767,6 +796,41 @@ function App() {
     }
   }
 
+  async function handleAdminOrderStatusChange(
+    orderId: number,
+    newStatus: OrderStatus,
+  ) {
+    try {
+      setAdminLoading(true)
+      setError(null)
+      setSuccessMessage(null)
+
+      const updatedOrder = await updateOrderStatus(orderId, newStatus)
+
+      setOrders((items) =>
+        items.map((order) =>
+          order.id === updatedOrder.id ? updatedOrder : order,
+        ),
+      )
+
+      setLastOrder((order) =>
+        order?.id === updatedOrder.id ? updatedOrder : order,
+      )
+
+      setSuccessMessage(
+        `Order #${updatedOrder.id} statusi: ${formatOrderStatus(updatedOrder.status)}`,
+      )
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Order statusini o‘zgartirishda xatolik',
+      )
+    } finally {
+      setAdminLoading(false)
+    }
+  }
+
   function renderAdminPage() {
     return (
       <section className="panel admin-panel">
@@ -973,7 +1037,25 @@ function App() {
                     </p>
                   </div>
 
-                  <span>{formatOrderStatus(order.status)}</span>
+                  <div className="admin-status-control">
+                    <span>{formatOrderStatus(order.status)}</span>
+                    <select
+                      value={order.status}
+                      onChange={(event) =>
+                        void handleAdminOrderStatusChange(
+                          order.id,
+                          event.target.value as OrderStatus,
+                        )
+                      }
+                      disabled={adminLoading}
+                    >
+                      {getOrderStatusOptions(order.status).map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </article>
               ))}
             </div>

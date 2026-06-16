@@ -79,47 +79,9 @@ def create_order_record(
 
 
 ORDER_STATUS_TRANSITIONS = {
-    "pending": {"confirmed", "cancelled"},
-    "confirmed": {"delivered", "cancelled"},
-    "delivered": set(),
-    "cancelled": set(),
-}
-
-
-def update_order_status(
-    db: Session,
-    order_id: int,
-    new_status: str,
-) -> Order | None:
-    order = get_order(db=db, order_id=order_id)
-
-    if order is None:
-        return None
-
-    current_status = order.status
-    allowed_statuses = ORDER_STATUS_TRANSITIONS.get(current_status, set())
-
-    if new_status == current_status:
-        return order
-
-    if new_status not in allowed_statuses:
-        raise ValueError(
-            f"Cannot change order status from {current_status} to {new_status}",
-        )
-
-    order.status = new_status
-    db.commit()
-
-    updated_order = get_order(db=db, order_id=order_id)
-    if updated_order is None:
-        raise RuntimeError("Updated order was not found")
-
-    return updated_order
-
-
-ORDER_STATUS_TRANSITIONS = {
-    "pending": {"confirmed", "cancelled"},
-    "confirmed": {"delivered", "cancelled"},
+    "pending": {"accepted", "cancelled"},
+    "accepted": {"shipping", "cancelled"},
+    "shipping": {"delivered", "cancelled"},
     "delivered": set(),
     "cancelled": set(),
 }

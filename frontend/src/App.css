@@ -1107,3 +1107,35 @@ button:disabled {
     display: grid;
   }
 }
+
+
+/* order-status-flow-v1 */
+
+.admin-status-control {
+  display: grid;
+  gap: 8px;
+  min-width: 190px;
+}
+
+.admin-status-control span {
+  display: inline-grid;
+  place-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f1f4ff;
+  color: #43506b;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.admin-status-control select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dce3f2;
+  border-radius: 14px;
+  color: #111827;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 800;
+  outline: none;
+}
