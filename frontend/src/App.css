@@ -777,3 +777,63 @@ button:disabled {
     display: grid;
   }
 }
+
+
+/* book-filter-sort-flow-v1 */
+
+.filter-toolbar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  margin: 0 0 20px;
+  padding: 16px;
+  border: 1px solid #e3e7f2;
+  border-radius: 20px;
+  background: #f8fafc;
+}
+
+.filter-field {
+  display: grid;
+  gap: 8px;
+  color: #43506b;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.filter-field select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dce3f2;
+  border-radius: 14px;
+  color: #111827;
+  background: #ffffff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: none;
+  outline: none;
+}
+
+.result-counter {
+  display: grid;
+  place-items: center;
+  min-height: 47px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  color: #111827;
+  background: #eef2ff;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .filter-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .result-counter {
+    justify-content: start;
+  }
+}

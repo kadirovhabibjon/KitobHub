@@ -18,6 +18,8 @@ type CartItem = {
 type Page = 'home' | 'book-detail' | 'cart' | 'orders'
 type OrderFormSource = 'buy-now' | 'cart' | null
 type PaymentMethod = 'cash' | 'card'
+type StockFilter = 'all' | 'available'
+type SortOption = 'default' | 'price-asc' | 'price-desc' | 'title-asc'
 
 function formatPrice(price: string, currency: string) {
   return `${Number(price).toLocaleString('uz-UZ')} ${currency}`
@@ -99,6 +101,9 @@ function App() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
 
   const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [stockFilter, setStockFilter] = useState<StockFilter>('all')
+  const [sortOption, setSortOption] = useState<SortOption>('default')
   const [loading, setLoading] = useState(true)
   const [ordersLoading, setOrdersLoading] = useState(false)
   const [orderLoading, setOrderLoading] = useState(false)
@@ -143,6 +148,40 @@ function App() {
   }, [lastOrder, orders, visibleOrderIds])
 
   const shouldShowOrdersNav = visibleOrders.length > 0
+
+  const categoryOptions = useMemo(() => {
+    return Array.from(new Set(books.map((book) => book.category_name))).sort(
+      (firstCategory, secondCategory) =>
+        firstCategory.localeCompare(secondCategory),
+    )
+  }, [books])
+
+  const filteredBooks = useMemo(() => {
+    const nextBooks = books.filter((book) => {
+      const categoryMatches =
+        categoryFilter === 'all' || book.category_name === categoryFilter
+      const stockMatches =
+        stockFilter === 'all' || book.stock_quantity > 0
+
+      return categoryMatches && stockMatches
+    })
+
+    return [...nextBooks].sort((firstBook, secondBook) => {
+      if (sortOption === 'price-asc') {
+        return Number(firstBook.price) - Number(secondBook.price)
+      }
+
+      if (sortOption === 'price-desc') {
+        return Number(secondBook.price) - Number(firstBook.price)
+      }
+
+      if (sortOption === 'title-asc') {
+        return firstBook.title.localeCompare(secondBook.title)
+      }
+
+      return firstBook.id - secondBook.id
+    })
+  }, [books, categoryFilter, stockFilter, sortOption])
 
   async function loadBooks(searchValue = search) {
     try {
@@ -490,11 +529,60 @@ function App() {
             </form>
           </div>
 
+          <div className="filter-toolbar">
+            <label className="filter-field">
+              Kategoriya
+              <select
+                value={categoryFilter}
+                onChange={(event) => setCategoryFilter(event.target.value)}
+              >
+                <option value="all">Barchasi</option>
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="filter-field">
+              Mavjudligi
+              <select
+                value={stockFilter}
+                onChange={(event) =>
+                  setStockFilter(event.target.value as StockFilter)
+                }
+              >
+                <option value="all">Barcha kitoblar</option>
+                <option value="available">Faqat mavjud kitoblar</option>
+              </select>
+            </label>
+
+            <label className="filter-field">
+              Saralash
+              <select
+                value={sortOption}
+                onChange={(event) =>
+                  setSortOption(event.target.value as SortOption)
+                }
+              >
+                <option value="default">Standart</option>
+                <option value="price-asc">Narx: arzonidan qimmatiga</option>
+                <option value="price-desc">Narx: qimmatidan arzoniga</option>
+                <option value="title-asc">Nomi bo‘yicha</option>
+              </select>
+            </label>
+
+            <div className="result-counter">
+              {filteredBooks.length} ta kitob
+            </div>
+          </div>
+
           {loading ? (
             <p className="muted">Yuklanmoqda...</p>
           ) : (
             <div className="book-grid">
-              {books.map((book) => (
+              {filteredBooks.map((book) => (
                 <article
                   className="book-card clickable-book-card"
                   key={book.id}
