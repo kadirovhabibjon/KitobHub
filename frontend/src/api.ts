@@ -1,3 +1,5 @@
+const AUTH_TOKEN_STORAGE_KEY = 'kitobhub_auth_token'
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8088/api'
 
@@ -92,6 +94,12 @@ export type TashkentWeather = {
   time: string | null
 }
 
+function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)
+
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
 async function request<T>(
   path: string,
   options?: RequestInit,
@@ -140,6 +148,7 @@ export async function fetchBooks(search?: string): Promise<BookListResponse> {
 export async function createBook(data: BookPayload): Promise<Book> {
   return request<Book>('/books', {
     method: 'POST',
+    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   })
 }
@@ -150,6 +159,7 @@ export async function updateBook(
 ): Promise<Book> {
   return request<Book>(`/books/${bookId}`, {
     method: 'PUT',
+    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   })
 }
@@ -157,6 +167,7 @@ export async function updateBook(
 export async function deleteBook(bookId: number): Promise<void> {
   return request<void>(`/books/${bookId}`, {
     method: 'DELETE',
+    headers: getAuthHeaders(),
   })
 }
 

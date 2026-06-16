@@ -24,6 +24,7 @@ from app.crud import (
     update_book,
 )
 from app.database import check_database_connection, get_db
+from app.security import require_admin
 from app.schemas import (
     BookCreate,
     BookListResponse,
@@ -134,7 +135,7 @@ def get_book_by_id(
     return payload
 
 
-@app.post("/books", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
+@app.post("/books", response_model=BookResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_admin)])
 def create_book_endpoint(
     data: BookCreate,
     db: Session = Depends(get_db),
@@ -144,7 +145,7 @@ def create_book_endpoint(
     return book_to_response(book)
 
 
-@app.put("/books/{book_id}", response_model=BookResponse)
+@app.put("/books/{book_id}", response_model=BookResponse, dependencies=[Depends(require_admin)])
 def update_book_endpoint(
     book_id: int,
     data: BookUpdate,
@@ -164,7 +165,7 @@ def update_book_endpoint(
     return book_to_response(updated_book)
 
 
-@app.delete("/books/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/books/{book_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_admin)])
 def delete_book_endpoint(
     book_id: int,
     db: Session = Depends(get_db),

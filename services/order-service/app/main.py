@@ -15,6 +15,7 @@ from app.catalog_client import (
 from app.crud import create_order_record, get_order, list_orders, order_to_response, update_order_status
 from app.database import check_database_connection, get_db
 from app.events import EventPublishError, publish_order_created_event
+from app.security import require_admin
 from app.schemas import OrderCreate, OrderListResponse, OrderResponse, OrderStatusUpdate
 
 
@@ -75,11 +76,11 @@ def get_order_by_id(
     return order_to_response(order)
 
 
-@app.put("/orders/{order_id}/status", response_model=OrderResponse)
+@app.put("/orders/{order_id}/status", response_model=OrderResponse, dependencies=[Depends(require_admin)])
 def update_order_status_endpoint(
     order_id: int,
     data: OrderStatusUpdate,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db)
 ) -> OrderResponse:
     try:
         order = update_order_status(
