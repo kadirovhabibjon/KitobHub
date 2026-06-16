@@ -2,24 +2,49 @@ import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import './App.css'
 import {
+  createBook,
   createOrder,
+  deleteBook,
   fetchBooks,
   fetchCurrencyRate,
   fetchOrders,
   fetchTashkentWeather,
+  updateBook,
 } from './api'
-import type { Book, CurrencyRate, Order, TashkentWeather } from './api'
+import type { Book, BookPayload, CurrencyRate, Order, TashkentWeather } from './api'
 
 type CartItem = {
   book: Book
   quantity: number
 }
 
-type Page = 'home' | 'book-detail' | 'favorites' | 'cart' | 'orders'
+type Page = 'home' | 'book-detail' | 'favorites' | 'cart' | 'orders' | 'admin'
 type OrderFormSource = 'buy-now' | 'cart' | null
 type PaymentMethod = 'cash' | 'card'
 type StockFilter = 'all' | 'available'
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'title-asc'
+
+type AdminBookForm = {
+  title: string
+  description: string
+  price: string
+  currency: string
+  image_url: string
+  stock_quantity: string
+  author_name: string
+  category_name: string
+}
+
+const emptyAdminBookForm: AdminBookForm = {
+  title: '',
+  description: '',
+  price: '',
+  currency: 'UZS',
+  image_url: '',
+  stock_quantity: '0',
+  author_name: '',
+  category_name: '',
+}
 
 function formatPrice(price: string, currency: string) {
   return `${Number(price).toLocaleString('uz-UZ')} ${currency}`
@@ -138,6 +163,10 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [stockFilter, setStockFilter] = useState<StockFilter>('all')
   const [sortOption, setSortOption] = useState<SortOption>('default')
+  const [adminBookForm, setAdminBookForm] =
+    useState<AdminBookForm>(emptyAdminBookForm)
+  const [editingBookId, setEditingBookId] = useState<number | null>(null)
+  const [adminLoading, setAdminLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [ordersLoading, setOrdersLoading] = useState(false)
   const [orderLoading, setOrderLoading] = useState(false)
@@ -335,7 +364,7 @@ function App() {
     setSelectedBook(null)
     setActivePage(page)
 
-    if (page === 'orders') {
+    if (page === 'orders' || page === 'admin') {
       void loadOrders()
     }
   }
@@ -565,6 +594,391 @@ function App() {
         </article>
 
         {toolsError && <div className="alert alert-error">{toolsError}</div>}
+      </section>
+    )
+  }
+
+  function handleAdminBookFieldChange(
+    field: keyof AdminBookForm,
+    value: string,
+  ) {
+    setAdminBookForm((form) => ({
+      ...form,
+      [field]: value,
+    }))
+  }
+
+  function handleStartCreateBook() {
+    setEditingBookId(null)
+    setAdminBookForm(emptyAdminBookForm)
+    setError(null)
+    setSuccessMessage(null)
+  }
+
+  function handleStartEditBook(book: Book) {
+    setEditingBookId(book.id)
+    setAdminBookForm({
+      title: book.title,
+      description: book.description ?? '',
+      price: String(Number(book.price)),
+      currency: book.currency,
+      image_url: book.image_url ?? '',
+      stock_quantity: String(book.stock_quantity),
+      author_name: book.author_name,
+      category_name: book.category_name,
+    })
+    setError(null)
+    setSuccessMessage(null)
+    setActivePage('admin')
+  }
+
+  function buildAdminBookPayload(): BookPayload | null {
+    const title = adminBookForm.title.trim()
+    const authorName = adminBookForm.author_name.trim()
+    const categoryName = adminBookForm.category_name.trim()
+    const currency = adminBookForm.currency.trim().toUpperCase() || 'UZS'
+    const price = Number(adminBookForm.price)
+    const stockQuantity = Number(adminBookForm.stock_quantity)
+
+    if (!title) {
+      setError('Kitob nomini kiriting')
+      return null
+    }
+
+    if (!authorName) {
+      setError('Muallif nomini kiriting')
+      return null
+    }
+
+    if (!categoryName) {
+      setError('Kategoriya nomini kiriting')
+      return null
+    }
+
+    if (!Number.isFinite(price) || price <= 0) {
+      setError('Narx 0 dan katta bo‘lishi kerak')
+      return null
+    }
+
+    if (!Number.isInteger(stockQuantity) || stockQuantity < 0) {
+      setError('Stock 0 yoki undan katta butun son bo‘lishi kerak')
+      return null
+    }
+
+    if (currency.length !== 3) {
+      setError('Valyuta 3 ta harfdan iborat bo‘lishi kerak, masalan UZS')
+      return null
+    }
+
+    return {
+      title,
+      description: adminBookForm.description.trim() || null,
+      price: String(price),
+      currency,
+      image_url: adminBookForm.image_url.trim() || null,
+      stock_quantity: stockQuantity,
+      author_name: authorName,
+      category_name: categoryName,
+    }
+  }
+
+  async function handleSubmitAdminBook(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const payload = buildAdminBookPayload()
+    if (!payload) {
+      return
+    }
+
+    try {
+      setAdminLoading(true)
+      setError(null)
+      setSuccessMessage(null)
+
+      if (editingBookId) {
+        const updatedBook = await updateBook(editingBookId, payload)
+
+        setBooks((items) =>
+          items.map((book) => (book.id === updatedBook.id ? updatedBook : book)),
+        )
+
+        if (selectedBook?.id === updatedBook.id) {
+          setSelectedBook(updatedBook)
+        }
+
+        setSuccessMessage(`${updatedBook.title} tahrirlandi`)
+      } else {
+        const createdBook = await createBook(payload)
+
+        setBooks((items) => [createdBook, ...items])
+        setSuccessMessage(`${createdBook.title} qo‘shildi`)
+      }
+
+      setEditingBookId(null)
+      setAdminBookForm(emptyAdminBookForm)
+      await loadBooks(search)
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Admin amalini bajarishda xatolik',
+      )
+    } finally {
+      setAdminLoading(false)
+    }
+  }
+
+  async function handleDeleteAdminBook(book: Book) {
+    const confirmed = window.confirm(
+      `${book.title} kitobini o‘chirishni xohlaysizmi?`,
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      setAdminLoading(true)
+      setError(null)
+      setSuccessMessage(null)
+
+      await deleteBook(book.id)
+
+      setBooks((items) => items.filter((item) => item.id !== book.id))
+      setFavoriteBookIds((ids) => ids.filter((id) => id !== book.id))
+      setCartItems((items) => items.filter((item) => item.book.id !== book.id))
+
+      if (selectedBook?.id === book.id) {
+        setSelectedBook(null)
+      }
+
+      if (editingBookId === book.id) {
+        setEditingBookId(null)
+        setAdminBookForm(emptyAdminBookForm)
+      }
+
+      setSuccessMessage(`${book.title} o‘chirildi`)
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Kitobni o‘chirishda xatolik',
+      )
+    } finally {
+      setAdminLoading(false)
+    }
+  }
+
+  function renderAdminPage() {
+    return (
+      <section className="panel admin-panel">
+        <div className="page-title">
+          <div>
+            <p className="eyebrow">Admin panel</p>
+            <h2>Kitoblar va buyurtmalar boshqaruvi</h2>
+            <p>
+              Kitob qo‘shish, tahrirlash, o‘chirish, stock va buyurtmalarni
+              ko‘rish.
+            </p>
+          </div>
+
+          <button type="button" onClick={handleStartCreateBook}>
+            + Yangi kitob
+          </button>
+        </div>
+
+        <div className="admin-layout">
+          <form className="admin-form" onSubmit={handleSubmitAdminBook}>
+            <h3>{editingBookId ? 'Kitobni tahrirlash' : 'Yangi kitob qo‘shish'}</h3>
+
+            <label>
+              Kitob nomi
+              <input
+                value={adminBookForm.title}
+                onChange={(event) =>
+                  handleAdminBookFieldChange('title', event.target.value)
+                }
+                placeholder="Masalan: Clean Architecture"
+              />
+            </label>
+
+            <label>
+              Tavsif
+              <textarea
+                value={adminBookForm.description}
+                onChange={(event) =>
+                  handleAdminBookFieldChange('description', event.target.value)
+                }
+                placeholder="Kitob haqida qisqa tavsif..."
+              />
+            </label>
+
+            <div className="admin-form-grid">
+              <label>
+                Narx
+                <input
+                  value={adminBookForm.price}
+                  onChange={(event) =>
+                    handleAdminBookFieldChange('price', event.target.value)
+                  }
+                  placeholder="150000"
+                  inputMode="decimal"
+                />
+              </label>
+
+              <label>
+                Valyuta
+                <input
+                  value={adminBookForm.currency}
+                  onChange={(event) =>
+                    handleAdminBookFieldChange('currency', event.target.value)
+                  }
+                  placeholder="UZS"
+                  maxLength={3}
+                />
+              </label>
+
+              <label>
+                Stock
+                <input
+                  value={adminBookForm.stock_quantity}
+                  onChange={(event) =>
+                    handleAdminBookFieldChange(
+                      'stock_quantity',
+                      event.target.value,
+                    )
+                  }
+                  placeholder="10"
+                  inputMode="numeric"
+                />
+              </label>
+            </div>
+
+            <label>
+              Rasm URL
+              <input
+                value={adminBookForm.image_url}
+                onChange={(event) =>
+                  handleAdminBookFieldChange('image_url', event.target.value)
+                }
+                placeholder="https://..."
+              />
+            </label>
+
+            <div className="admin-form-grid two">
+              <label>
+                Muallif
+                <input
+                  value={adminBookForm.author_name}
+                  onChange={(event) =>
+                    handleAdminBookFieldChange('author_name', event.target.value)
+                  }
+                  placeholder="Robert C. Martin"
+                />
+              </label>
+
+              <label>
+                Kategoriya
+                <input
+                  value={adminBookForm.category_name}
+                  onChange={(event) =>
+                    handleAdminBookFieldChange(
+                      'category_name',
+                      event.target.value,
+                    )
+                  }
+                  placeholder="Programming"
+                />
+              </label>
+            </div>
+
+            <div className="admin-form-actions">
+              <button type="submit" disabled={adminLoading}>
+                {adminLoading
+                  ? 'Saqlanmoqda...'
+                  : editingBookId
+                    ? 'Saqlash'
+                    : 'Kitob qo‘shish'}
+              </button>
+
+              {editingBookId && (
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={handleStartCreateBook}
+                >
+                  Bekor qilish
+                </button>
+              )}
+            </div>
+          </form>
+
+          <div className="admin-list">
+            <div className="admin-section-header">
+              <h3>Kitoblar</h3>
+              <span>{books.length} ta</span>
+            </div>
+
+            {books.map((book) => (
+              <article className="admin-book-card" key={book.id}>
+                <div>
+                  <strong>{book.title}</strong>
+                  <p>
+                    {book.author_name} · {book.category_name} ·{' '}
+                    {formatPrice(book.price, book.currency)}
+                  </p>
+                  <p>Stock: {book.stock_quantity}</p>
+                </div>
+
+                <div className="admin-card-actions">
+                  <button type="button" onClick={() => handleStartEditBook(book)}>
+                    Tahrirlash
+                  </button>
+
+                  <button
+                    className="danger-button"
+                    type="button"
+                    onClick={() => void handleDeleteAdminBook(book)}
+                    disabled={adminLoading}
+                  >
+                    O‘chirish
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="admin-orders">
+          <div className="admin-section-header">
+            <h3>Buyurtmalar</h3>
+            <span>{orders.length} ta</span>
+          </div>
+
+          {ordersLoading ? (
+            <p className="muted">Buyurtmalar yuklanmoqda...</p>
+          ) : orders.length === 0 ? (
+            <p className="muted">Hali buyurtmalar yo‘q.</p>
+          ) : (
+            <div className="admin-order-list">
+              {orders.slice(0, 8).map((order) => (
+                <article className="admin-order-card" key={order.id}>
+                  <div>
+                    <strong>Order #{order.id}</strong>
+                    <p>
+                      {order.customer_name} ·{' '}
+                      {formatPrice(order.total_amount, order.currency)}
+                    </p>
+                    <p>
+                      {order.customer_phone ?? 'Telefon yo‘q'} ·{' '}
+                      {order.delivery_address ?? 'Manzil yo‘q'}
+                    </p>
+                  </div>
+
+                  <span>{formatOrderStatus(order.status)}</span>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
     )
   }
@@ -1117,6 +1531,14 @@ function App() {
           ♥ Sevimlilar <span>{favoriteBookIds.length}</span>
         </button>
 
+        <button
+          className={activePage === 'admin' ? 'active' : ''}
+          type="button"
+          onClick={() => goToPage('admin')}
+        >
+          Admin
+        </button>
+
         {shouldShowOrdersNav && (
           <button
             className={activePage === 'orders' ? 'active' : ''}
@@ -1247,6 +1669,7 @@ function App() {
       {activePage === 'favorites' && renderFavoritesPage()}
       {activePage === 'cart' && renderCartPage()}
       {activePage === 'orders' && renderOrdersPage()}
+      {activePage === 'admin' && renderAdminPage()}
     </main>
   )
 }

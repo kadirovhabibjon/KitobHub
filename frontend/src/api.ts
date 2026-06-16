@@ -20,6 +20,17 @@ export type BookListResponse = {
   total: number
 }
 
+export type BookPayload = {
+  title: string
+  description?: string | null
+  price: string
+  currency: string
+  image_url?: string | null
+  stock_quantity: number
+  author_name: string
+  category_name: string
+}
+
 export type OrderItem = {
   id: number
   book_id: number
@@ -108,6 +119,10 @@ async function request<T>(
     throw new Error(message)
   }
 
+  if (response.status === 204) {
+    return undefined as T
+  }
+
   return response.json() as Promise<T>
 }
 
@@ -120,6 +135,29 @@ export async function fetchBooks(search?: string): Promise<BookListResponse> {
 
   const query = params.toString()
   return request<BookListResponse>(`/books${query ? `?${query}` : ''}`)
+}
+
+export async function createBook(data: BookPayload): Promise<Book> {
+  return request<Book>('/books', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function updateBook(
+  bookId: number,
+  data: Partial<BookPayload>,
+): Promise<Book> {
+  return request<Book>(`/books/${bookId}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deleteBook(bookId: number): Promise<void> {
+  return request<void>(`/books/${bookId}`, {
+    method: 'DELETE',
+  })
 }
 
 export async function fetchOrders(): Promise<OrderListResponse> {

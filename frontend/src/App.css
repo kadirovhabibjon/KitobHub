@@ -946,3 +946,164 @@ button:disabled {
     min-width: 0;
   }
 }
+
+
+/* admin-panel-flow-v1 */
+
+.admin-panel {
+  display: grid;
+  gap: 24px;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.admin-form,
+.admin-list,
+.admin-orders {
+  padding: 20px;
+  border: 1px solid #e3e7f2;
+  border-radius: 22px;
+  background: #f8fafc;
+}
+
+.admin-form h3,
+.admin-section-header h3 {
+  margin: 0;
+}
+
+.admin-form {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-form label {
+  display: grid;
+  gap: 8px;
+  color: #43506b;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-form input,
+.admin-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dce3f2;
+  border-radius: 14px;
+  color: #111827;
+  background: #ffffff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: none;
+  outline: none;
+}
+
+.admin-form textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.7fr 0.7fr;
+  gap: 12px;
+}
+
+.admin-form-grid.two {
+  grid-template-columns: 1fr 1fr;
+}
+
+.admin-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.secondary-button {
+  color: #111827;
+  background: #eef2ff;
+}
+
+.danger-button {
+  color: #ffffff;
+  background: #8a1f1f;
+}
+
+.admin-section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.admin-section-header span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #111827;
+  font-weight: 900;
+}
+
+.admin-list,
+.admin-order-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-book-card,
+.admin-order-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #e3e7f2;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.admin-book-card p,
+.admin-order-card p {
+  margin: 6px 0 0;
+  color: #697287;
+}
+
+.admin-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-card-actions button {
+  padding: 10px 12px;
+}
+
+.admin-order-card span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f1f4ff;
+  color: #43506b;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+@media (max-width: 900px) {
+  .admin-layout,
+  .admin-form-grid,
+  .admin-form-grid.two,
+  .admin-book-card,
+  .admin-order-card {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-card-actions {
+    display: grid;
+  }
+}
