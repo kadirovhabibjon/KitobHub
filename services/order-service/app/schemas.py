@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -14,6 +15,10 @@ class OrderCreate(BaseModel):
     customer_email: str | None = Field(default=None, max_length=255)
     note: str | None = None
     items: list[OrderItemCreate] = Field(min_length=1)
+
+
+class OrderStatusUpdate(BaseModel):
+    status: Literal["pending", "confirmed", "delivered", "cancelled"]
 
 
 class OrderItemResponse(BaseModel):
