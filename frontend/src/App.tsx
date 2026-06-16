@@ -348,11 +348,10 @@ function App() {
 
       const order = await createOrder({
         customer_name: customerName.trim(),
-        note: [
-          `Telefon: ${customerPhone.trim()}`,
-          `Manzil: ${customerAddress.trim()}`,
-          `To‘lov turi: ${formatPaymentMethod(paymentMethod)}`,
-        ].join(' | '),
+        customer_phone: customerPhone.trim(),
+        delivery_address: customerAddress.trim(),
+        payment_method: paymentMethod,
+        note: null,
         items: orderFormItems.map((item) => ({
           book_id: item.book.id,
           quantity: item.quantity,
@@ -673,7 +672,12 @@ function App() {
                   ))}
                 </ul>
 
-                {order.note && <p className="order-note">{order.note}</p>}
+                                <div className="order-note">
+                  {order.customer_phone && <p>Telefon: {order.customer_phone}</p>}
+                  {order.delivery_address && <p>Manzil: {order.delivery_address}</p>}
+                  <p>To‘lov turi: {formatPaymentMethod(order.payment_method === 'card' ? 'card' : 'cash')}</p>
+                  {order.note && <p>Izoh: {order.note}</p>}
+                </div>
               </div>
             ))}
           </div>

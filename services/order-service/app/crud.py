@@ -41,6 +41,9 @@ def create_order_record(
     order = Order(
         customer_name=data.customer_name.strip(),
         customer_email=data.customer_email,
+        customer_phone=data.customer_phone,
+        delivery_address=data.delivery_address,
+        payment_method=data.payment_method,
         status="pending",
         total_amount=Decimal("0.00"),
         currency=currency,

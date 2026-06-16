@@ -33,6 +33,9 @@ export type Order = {
   id: number
   customer_name: string
   customer_email: string | null
+  customer_phone: string | null
+  delivery_address: string | null
+  payment_method: string
   status: string
   total_amount: string
   currency: string
@@ -50,6 +53,9 @@ export type OrderListResponse = {
 export type CreateOrderRequest = {
   customer_name: string
   customer_email?: string
+  customer_phone?: string
+  delivery_address?: string
+  payment_method?: 'cash' | 'card'
   note?: string
   items: {
     book_id: number
