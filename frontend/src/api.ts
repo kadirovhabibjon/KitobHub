@@ -56,7 +56,7 @@ export type CreateOrderRequest = {
   customer_phone?: string
   delivery_address?: string
   payment_method?: 'cash' | 'card'
-  note?: string
+  note?: string | null
   items: {
     book_id: number
     quantity: number
