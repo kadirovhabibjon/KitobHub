@@ -3,6 +3,7 @@ from typing import Literal
 from fastapi import Depends, FastAPI, HTTPException, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.cache import (
@@ -233,3 +234,85 @@ def decrease_internal_book_stock(
     invalidate_books_cache(book_id=book_id)
 
     return internal_book_to_response(updated_book)
+
+
+@app.get("/ads/active")
+def get_active_ad(db: Session = Depends(get_db)) -> dict:
+    ad = (
+        db.execute(
+            text(
+                """
+                SELECT
+                    id,
+                    title,
+                    description,
+                    badge,
+                    video_url,
+                    poster_url,
+                    cta_label,
+                    position,
+                    is_active,
+                    created_at,
+                    updated_at
+                FROM advertisements
+                WHERE is_active = true
+                ORDER BY id DESC
+                LIMIT 1
+                """
+            )
+        )
+        .mappings()
+        .first()
+    )
+
+    if not ad:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "Active advertisement not found"},
+        )
+
+    return dict(ad)
+
+
+@app.put("/ads/active")
+def update_active_ad(
+    payload: dict,
+    db: Session = Depends(get_db),
+    _admin: dict = Depends(require_admin),
+) -> dict:
+    allowed_fields = {
+        "title",
+        "description",
+        "badge",
+        "video_url",
+        "poster_url",
+        "cta_label",
+        "position",
+        "is_active",
+    }
+
+    updates = {
+        key: value
+        for key, value in payload.items()
+        if key in allowed_fields
+    }
+
+    if not updates:
+        return get_active_ad(db)
+
+    active_ad = get_active_ad(db)
+    set_clause = ", ".join(f"{key} = :{key}" for key in updates)
+
+    db.execute(
+        text(
+            f"""
+            UPDATE advertisements
+            SET {set_clause}, updated_at = CURRENT_TIMESTAMP
+            WHERE id = :ad_id
+            """
+        ),
+        {**updates, "ad_id": active_ad["id"]},
+    )
+    db.commit()
+
+    return get_active_ad(db)

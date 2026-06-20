@@ -724,7 +724,7 @@ button:disabled {
 
 .detail-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   margin: 10px 0 24px;
 }
@@ -1287,5 +1287,776 @@ button:disabled {
   .auth-user-chip {
     width: 100%;
     justify-content: space-between;
+  }
+}
+
+
+/* KitobHub home tools right sidebar */
+.home-tools-sidebar {
+  float: right;
+  width: 320px;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
+  margin: 0 0 24px 24px !important;
+}
+
+.home-tools-sidebar > * {
+  width: 100%;
+  min-width: 0;
+}
+
+.home-tools-sidebar article,
+.home-tools-sidebar .integration-card,
+.home-tools-sidebar .tool-card,
+.home-tools-sidebar .info-card,
+.home-tools-sidebar .stat-card,
+.home-tools-sidebar .dashboard-card {
+  width: 100%;
+}
+
+.home-books-main {
+  width: calc(100% - 344px);
+  margin-top: 0 !important;
+}
+
+.home-books-main::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+@media (max-width: 1180px) {
+  .home-tools-sidebar {
+    float: none;
+    width: 100%;
+    margin: 24px 0 !important;
+  }
+
+  .home-books-main {
+    width: 100%;
+  }
+}
+
+
+/* KitobHub sidebar ads */
+.sidebar-ad-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.sidebar-ad-card {
+  border: 1px solid rgba(110, 122, 160, 0.22);
+  border-radius: 22px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.sidebar-ad-card h3 {
+  margin: 8px 0 8px;
+  font-size: 20px;
+  line-height: 1.15;
+  color: #111827;
+}
+
+.sidebar-ad-card p {
+  margin: 0;
+  color: #667085;
+  line-height: 1.45;
+  font-size: 14px;
+}
+
+.sidebar-ad-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.sidebar-ad-card-featured {
+  position: relative;
+  background:
+    radial-gradient(circle at top right, rgba(79, 70, 229, 0.24), transparent 34%),
+    linear-gradient(145deg, #ffffff, #f7f7ff);
+}
+
+.sidebar-ad-card-featured::after {
+  content: "AD";
+  position: absolute;
+  right: -16px;
+  bottom: -24px;
+  font-size: 86px;
+  font-weight: 900;
+  color: rgba(79, 70, 229, 0.08);
+  letter-spacing: -0.08em;
+}
+
+.sidebar-ad-highlight {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 16px;
+  background: #111827;
+  color: #ffffff;
+}
+
+.sidebar-ad-highlight span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+}
+
+.sidebar-ad-highlight strong {
+  font-size: 15px;
+  letter-spacing: 0.06em;
+}
+
+.sidebar-ad-card-partner {
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, 0.13), transparent 45%),
+    #ffffff;
+}
+
+.sidebar-ad-button {
+  width: 100%;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: #10b981;
+  color: #ffffff;
+  font-weight: 800;
+  cursor: default;
+}
+
+.sidebar-ad-card-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #111827;
+  color: #ffffff;
+}
+
+.sidebar-ad-card-mini span {
+  font-size: 13px;
+  color: #c7d2fe;
+}
+
+.sidebar-ad-card-mini strong {
+  font-size: 18px;
+}
+
+.sidebar-ad-card-mini small {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+
+/* KitobHub sidebar video ad */
+.sidebar-video-card {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(16, 185, 129, 0.22), transparent 30%),
+    radial-gradient(circle at 100% 20%, rgba(79, 70, 229, 0.2), transparent 32%),
+    #ffffff;
+}
+
+.sidebar-video-frame {
+  position: relative;
+  margin-top: 12px;
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 150px;
+  background:
+    linear-gradient(135deg, rgba(17, 24, 39, 0.15), rgba(79, 70, 229, 0.22)),
+    linear-gradient(135deg, #eef2ff, #f8fafc);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+}
+
+.sidebar-video-cover {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.sidebar-video-cover::before {
+  content: "KITOBHUB";
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: rgba(79, 70, 229, 0.75);
+}
+
+.sidebar-video-cover::after {
+  content: "BOOK TRAILER";
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: rgba(17, 24, 39, 0.54);
+}
+
+.sidebar-video-play {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  background: #111827;
+  color: #ffffff;
+  box-shadow: 0 18px 40px rgba(17, 24, 39, 0.24);
+  font-size: 22px;
+  padding-left: 3px;
+}
+
+.sidebar-video-time {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(17, 24, 39, 0.86);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sidebar-video-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 11px 12px;
+  border-radius: 15px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+
+.sidebar-video-meta span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sidebar-video-meta strong {
+  font-size: 13px;
+  color: #064e3b;
+}
+
+
+/* KitobHub clickable real video ad */
+.sidebar-video-player {
+  margin-top: 12px;
+}
+
+.sidebar-video-player summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.sidebar-video-player summary::-webkit-details-marker {
+  display: none;
+}
+
+.sidebar-video-player[open] .sidebar-video-frame {
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+.sidebar-video-player[open] .sidebar-video-play {
+  transform: scale(0.92);
+  background: #10b981;
+}
+
+.sidebar-video-real {
+  margin-top: 12px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  background: #111827;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-video-element {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #111827;
+}
+
+.sidebar-video-player[open] + h3 {
+  margin-top: 14px;
+}
+
+
+/* KitobHub book trailer iframe */
+.sidebar-video-youtube {
+  margin-top: 12px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #111827;
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14);
+}
+
+.sidebar-video-iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  background: #111827;
+}
+
+.sidebar-video-player[open] .sidebar-video-play {
+  background: #10b981;
+  transform: scale(0.94);
+}
+
+.sidebar-video-player summary {
+  cursor: pointer;
+}
+
+
+
+
+
+
+/* KitobHub cart button micro interaction */
+.cart-button-added {
+  position: relative !important;
+  overflow: visible !important;
+  animation: cartButtonAddedPop 0.75s cubic-bezier(0.2, 0.9, 0.2, 1) both !important;
+  box-shadow:
+    0 0 0 5px rgba(16, 185, 129, 0.18),
+    0 20px 42px rgba(16, 185, 129, 0.30) !important;
+}
+
+.cart-button-added::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  border: 2px solid rgba(16, 185, 129, 0.55);
+  animation: cartButtonRing 0.85s ease-out both;
+  pointer-events: none;
+}
+
+.cart-added-label {
+  position: fixed;
+  z-index: 99999;
+  transform: translate(-50%, -100%);
+  white-space: nowrap;
+  border-radius: 999px;
+  padding: 9px 13px;
+  background: #10b981;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 18px 38px rgba(16, 185, 129, 0.34);
+  pointer-events: none;
+  animation: cartAddedLabelFly 1.05s ease both;
+}
+
+.cart-fly-icon {
+  position: fixed;
+  z-index: 99998;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: #10b981;
+  color: #ffffff;
+  font-size: 20px;
+  box-shadow: 0 16px 34px rgba(16, 185, 129, 0.34);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: cartFlyToNav 1.05s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+.cart-card-added {
+  animation: cartCardGlow 0.95s ease both !important;
+}
+
+.cart-nav-pulse {
+  animation: cartNavPulse 1s cubic-bezier(0.2, 0.9, 0.2, 1) both !important;
+}
+
+@keyframes cartButtonAddedPop {
+  0% {
+    transform: scale(1);
+  }
+
+  32% {
+    transform: scale(0.93);
+  }
+
+  62% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes cartButtonRing {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.88);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes cartAddedLabelFly {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -80%) scale(0.9);
+  }
+
+  25% {
+    opacity: 1;
+    transform: translate(-50%, -115%) scale(1);
+  }
+
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -128%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -148%) scale(0.96);
+  }
+}
+
+@keyframes cartFlyToNav {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.75);
+  }
+
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(-50% + var(--fly-x)), calc(-50% + var(--fly-y)))
+      scale(0.35);
+  }
+}
+
+@keyframes cartCardGlow {
+  0% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+  }
+
+  35% {
+    box-shadow:
+      0 0 0 4px rgba(16, 185, 129, 0.2),
+      0 26px 70px rgba(16, 185, 129, 0.18);
+  }
+
+  100% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes cartNavPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  38% {
+    transform: scale(1.1);
+    box-shadow: 0 14px 34px rgba(16, 185, 129, 0.26);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+/* KitobHub site footer */
+.site-footer {
+  position: relative;
+  margin-top: 72px;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background: #ffffff;
+}
+
+.footer-benefits {
+  background: linear-gradient(135deg, #006dff, #0878ff);
+  padding: 52px 24px;
+}
+
+.footer-benefits-card {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  padding: 28px;
+  border-radius: 28px;
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(0, 73, 184, 0.28);
+}
+
+.footer-benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.footer-benefit-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  background: rgba(0, 109, 255, 0.1);
+  font-size: 23px;
+}
+
+.footer-benefit-item h3 {
+  margin: 0 0 6px;
+  color: #0f172a;
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.footer-benefit-item p {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.footer-main {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 42px 24px 34px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr 1.35fr 1fr;
+  gap: 34px;
+}
+
+.footer-column h3,
+.footer-bottom-row h3 {
+  margin: 0 0 16px;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-column a,
+.footer-column p {
+  margin: 0;
+  color: #667085;
+  text-decoration: none;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.footer-column a:hover {
+  color: #006dff;
+}
+
+.footer-delivery button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: left;
+  cursor: default;
+}
+
+.footer-delivery button span {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.footer-bottom-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 44px;
+}
+
+.footer-payment-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-payment-list span {
+  min-width: 112px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  padding: 13px 16px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+}
+
+.footer-social {
+  text-align: right;
+}
+
+.footer-social div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.footer-social a {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.footer-social a:hover {
+  background: #006dff;
+  color: #ffffff;
+}
+
+.footer-copyright {
+  margin-top: 34px;
+  padding-top: 22px;
+  border-top: 1px solid #e2e8f0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.footer-copyright p {
+  margin: 0;
+}
+
+.footer-chat-button {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 999px;
+  background: #006dff;
+  color: #ffffff;
+  font-size: 27px;
+  box-shadow: 0 18px 42px rgba(0, 109, 255, 0.35);
+  cursor: pointer;
+}
+
+.footer-chat-button::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: inherit;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+@media (max-width: 1180px) {
+  .footer-benefits-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-bottom-row {
+    flex-direction: column;
+  }
+
+  .footer-social {
+    text-align: left;
+  }
+
+  .footer-social div {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .footer-benefits {
+    padding: 36px 16px;
+  }
+
+  .footer-benefits-card,
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-benefits-card {
+    padding: 22px;
+  }
+
+  .footer-main {
+    padding: 34px 16px;
+  }
+
+  .footer-chat-button {
+    right: 18px;
+    bottom: 18px;
   }
 }

@@ -27,7 +27,6 @@ type OrderFormSource = 'buy-now' | 'cart' | null
 type AuthMode = 'login' | 'register'
 
 type PaymentMethod = 'cash' | 'card'
-type StockFilter = 'all' | 'available'
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'title-asc'
 
 type AuthForm = {
@@ -217,7 +216,6 @@ function App() {
 
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
-  const [stockFilter, setStockFilter] = useState<StockFilter>('all')
   const [sortOption, setSortOption] = useState<SortOption>('default')
   const [adminBookForm, setAdminBookForm] =
     useState<AdminBookForm>(emptyAdminBookForm)
@@ -279,10 +277,7 @@ function App() {
     const nextBooks = books.filter((book) => {
       const categoryMatches =
         categoryFilter === 'all' || book.category_name === categoryFilter
-      const stockMatches =
-        stockFilter === 'all' || book.stock_quantity > 0
-
-      return categoryMatches && stockMatches
+      return categoryMatches
     })
 
     return [...nextBooks].sort((firstBook, secondBook) => {
@@ -300,7 +295,7 @@ function App() {
 
       return firstBook.id - secondBook.id
     })
-  }, [books, categoryFilter, stockFilter, sortOption])
+  }, [books, categoryFilter, sortOption])
 
   const favoriteBooks = useMemo(() => {
     const favoriteIdSet = new Set(favoriteBookIds)
@@ -446,6 +441,8 @@ function App() {
     if (book.stock_quantity <= 0) {
       setError('Bu kitob hozircha omborda yo‘q')
       return
+
+
     }
 
     setError(null)
@@ -619,7 +616,7 @@ function App() {
 
   function renderTools() {
     return (
-      <section className="tools-grid">
+      <section className="tools-grid home-tools-sidebar">
         <article className="tool-card">
           <div>
             <span className="tool-label">Valyuta integratsiyasi</span>
@@ -667,6 +664,61 @@ function App() {
         </article>
 
         {toolsError && <div className="alert alert-error">{toolsError}</div>}
+
+            <div className="sidebar-ad-stack" aria-label="Reklama va promolar">
+              <article className="sidebar-ad-card sidebar-ad-card-featured">
+                <span className="sidebar-ad-badge">SPONSORED</span>
+                <h3>Haftaning kitobi</h3>
+                <p>
+                  Dasturchilar uchun eng ko‘p tavsiya qilinadigan kitoblarni
+                  KitobHub orqali tez toping.
+                </p>
+                <div className="sidebar-ad-highlight">
+                  <span>Promo</span>
+                  <strong>KITOBHUB10</strong>
+                </div>
+              </article>
+
+              <article className="sidebar-ad-card sidebar-video-card">
+                <span className="sidebar-ad-badge">VIDEO AD</span>
+
+                <details className="sidebar-video-player">
+                  <summary className="sidebar-video-frame" aria-label="Kitob video reklamasini ko‘rish">
+                    <div className="sidebar-video-cover">
+                      <span className="sidebar-video-play">▶</span>
+                    </div>
+                    <span className="sidebar-video-time">00:45</span>
+                  </summary>
+
+                  <div className="sidebar-video-real sidebar-video-youtube">
+                    <iframe
+                      className="sidebar-video-iframe"
+                      src="https://www.youtube-nocookie.com/embed/9P4ri-WCdDw?rel=0&modestbranding=1&autoplay=1&mute=1"
+                      title="Kitob video reklamasi"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                </details>
+
+                <h3>Kitob video reklamasi</h3>
+                <p>
+                  Yangi kelgan kitoblar uchun qisqa trailer, promo video yoki
+                  nashriyot reklamasini shu joyda ko‘rsatish mumkin.
+                </p>
+
+                <div className="sidebar-video-meta">
+                  <span>Book trailer</span>
+                  <strong>Demo integratsiya</strong>
+                </div>
+              </article>
+
+              <article className="sidebar-ad-card sidebar-ad-card-mini">
+                <span>🔥 Bugungi promo</span>
+                <strong>Top kitoblarga chegirma</strong>
+                <small>Demo reklama integratsiyasi</small>
+              </article>
+            </div>
       </section>
     )
   }
@@ -1299,7 +1351,7 @@ function App() {
       <>
         {renderTools()}
 
-        <section className="panel">
+        <section className="panel home-books-main">
           <div className="panel-header">
             <div>
               <h2>Kitoblar</h2>
@@ -1332,18 +1384,6 @@ function App() {
               </select>
             </label>
 
-            <label className="filter-field">
-              Mavjudligi
-              <select
-                value={stockFilter}
-                onChange={(event) =>
-                  setStockFilter(event.target.value as StockFilter)
-                }
-              >
-                <option value="all">Barcha kitoblar</option>
-                <option value="available">Faqat mavjud kitoblar</option>
-              </select>
-            </label>
 
             <label className="filter-field">
               Saralash
@@ -2001,7 +2041,127 @@ function App() {
       {activePage === 'orders' && renderOrdersPage()}
       {activePage === 'auth' && renderAuthPage()}
         {activePage === 'admin' && renderAdminPage()}
-    </main>
+    
+      <footer className="site-footer">
+        <section className="footer-benefits" aria-label="KitobHub afzalliklari">
+          <div className="footer-benefits-card">
+            <article className="footer-benefit-item">
+              <span className="footer-benefit-icon">📦</span>
+              <div>
+                <h3>Endi bozorlarga borishga hojat yo‘q</h3>
+                <p>KitobHub orqali kitoblarni tez va qulay buyurtma qiling.</p>
+              </div>
+            </article>
+
+            <article className="footer-benefit-item">
+              <span className="footer-benefit-icon">🚚</span>
+              <div>
+                <h3>Tez yetkazib berish</h3>
+                <p>Buyurtmalar qisqa vaqt ichida manzilingizga yetkaziladi.</p>
+              </div>
+            </article>
+
+            <article className="footer-benefit-item">
+              <span className="footer-benefit-icon">💳</span>
+              <div>
+                <h3>Qulay to‘lov</h3>
+                <p>Naqd yoki karta orqali to‘lov qilish imkoniyati mavjud.</p>
+              </div>
+            </article>
+
+            <article className="footer-benefit-item">
+              <span className="footer-benefit-icon">🛡️</span>
+              <div>
+                <h3>KitobHub kafolati</h3>
+                <p>Sifatli xizmat, xavfsiz buyurtma va ishonchli savdo.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section className="footer-main">
+          <div className="footer-grid">
+            <div className="footer-column">
+              <h3>KitobHub haqida</h3>
+              <a href="#">Biz haqimizda</a>
+              <a href="#">KitobHub jamoasi</a>
+              <a href="#">Litsenziya va guvohnoma</a>
+              <a href="#">Hamkorlik</a>
+              <a href="#">Biz bilan aloqa</a>
+            </div>
+
+            <div className="footer-column">
+              <h3>Mijozlar uchun</h3>
+              <a href="#">Ko‘p so‘raladigan savollar</a>
+              <a href="#">Buyurtma holatini kuzatish</a>
+              <a href="#">Ommaviy oferta</a>
+              <a href="#">Qaytarish shartlari</a>
+              <a href="#">Yetkazib berish tartibi</a>
+            </div>
+
+            <div className="footer-column">
+              <h3>Ma’lumotlar</h3>
+              <a href="#">Kategoriyalar</a>
+              <a href="#">Yangiliklar</a>
+              <a href="#">Blog</a>
+              <a href="#">KitobHub Ads</a>
+              <a href="#">Sayt xaritasi</a>
+            </div>
+
+            <div className="footer-column footer-delivery">
+              <h3>Yetkazib berish va do‘konlar</h3>
+              <button type="button">🏬 Bizning do‘konlar <span>›</span></button>
+              <button type="button">📍 Olib ketish punktlari <span>›</span></button>
+              <button type="button">🚚 Yetkazib berish <span>›</span></button>
+            </div>
+
+            <div className="footer-column footer-contact">
+              <h3>Biz bilan aloqa</h3>
+              <a href="tel:+998971200105">📞 +998 97 120 01 05</a>
+              <a href="mailto:info@kitobhub.uz">✉️ info@kitobhub.uz</a>
+              <a href="#">✈️ Telegram bot</a>
+              <p>📍 Toshkent shahri, KitobHub demo ofisi</p>
+            </div>
+          </div>
+
+          <div className="footer-bottom-row">
+            <div>
+              <h3>To‘lov turlari</h3>
+              <div className="footer-payment-list">
+                <span>💳 UZCARD</span>
+                <span>💳 HUMO</span>
+                <span>Payme</span>
+                <span>Uzum</span>
+                <span>Click</span>
+                <span>Paynet</span>
+              </div>
+            </div>
+
+            <div className="footer-social">
+              <h3>Biz ijtimoiy tarmoqlarda</h3>
+              <div>
+                <a href="#">f</a>
+                <a href="#">tg</a>
+                <a href="#">ig</a>
+                <a href="#">yt</a>
+              </div>
+            </div>
+          </div>
+
+          <div className="footer-copyright">
+            <p>
+              2026 © KitobHub. Online kitob do‘koni demo portfolio loyihasi.
+              Barcha huquqlar himoyalangan.
+            </p>
+          </div>
+        </section>
+
+        <button type="button" className="footer-chat-button" aria-label="Chat orqali bog‘lanish">
+          💬
+        </button>
+      </footer>
+
+</main>
   )
 }
 

@@ -9,5 +9,180 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+  
+    <!-- KitobHub cart button animation -->
+    <script>
+      ;(() => {
+        function isCartAddButton(button) {
+          const text = (button.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase()
+          const aria = (button.getAttribute('aria-label') || '').toLowerCase()
+
+          if (text.includes('sevimli') || text.includes('♡') || text.includes('♥')) {
+            return false
+          }
+
+          return (
+            text.includes('hoziroq xarid qilish') ||
+            text.includes('savat') ||
+            text.includes('🛒') ||
+            aria.includes('savat') ||
+            aria.includes('cart')
+          )
+        }
+
+        function findCartNavButton() {
+          return Array.from(document.querySelectorAll('button')).find((button) =>
+            (button.textContent || '').includes('Savatcha')
+          )
+        }
+
+        function animateAddToCart(button) {
+          const rect = button.getBoundingClientRect()
+          const cartNav = findCartNavButton()
+          const navRect = cartNav ? cartNav.getBoundingClientRect() : null
+
+          button.classList.remove('cart-button-added')
+          void button.offsetWidth
+          button.classList.add('cart-button-added')
+
+          const label = document.createElement('div')
+          label.className = 'cart-added-label'
+          label.textContent = '✓ Savatga qo‘shildi'
+          label.style.left = `${rect.left + rect.width / 2}px`
+          label.style.top = `${rect.top - 10}px`
+          document.body.appendChild(label)
+
+          const fly = document.createElement('div')
+          fly.className = 'cart-fly-icon'
+          fly.textContent = '🛒'
+          fly.style.left = `${rect.left + rect.width / 2}px`
+          fly.style.top = `${rect.top + rect.height / 2}px`
+
+          if (navRect) {
+            fly.style.setProperty('--fly-x', `${navRect.left + navRect.width / 2 - (rect.left + rect.width / 2)}px`)
+            fly.style.setProperty('--fly-y', `${navRect.top + navRect.height / 2 - (rect.top + rect.height / 2)}px`)
+          } else {
+            fly.style.setProperty('--fly-x', '0px')
+            fly.style.setProperty('--fly-y', '-80px')
+          }
+
+          document.body.appendChild(fly)
+
+          const card = button.closest('article, .book-card, .product-card, .catalog-card, [class*="card"]')
+          if (card) {
+            card.classList.remove('cart-card-added')
+            void card.offsetWidth
+            card.classList.add('cart-card-added')
+          }
+
+          if (cartNav) {
+            cartNav.classList.remove('cart-nav-pulse')
+            void cartNav.offsetWidth
+            cartNav.classList.add('cart-nav-pulse')
+          }
+
+          window.setTimeout(() => {
+            label.remove()
+            fly.remove()
+            button.classList.remove('cart-button-added')
+            if (card) card.classList.remove('cart-card-added')
+            if (cartNav) cartNav.classList.remove('cart-nav-pulse')
+          }, 1150)
+        }
+
+        document.addEventListener(
+          'click',
+          (event) => {
+            const target = event.target
+            if (!(target instanceof Element)) return
+
+            const button = target.closest('button')
+            if (!button || !isCartAddButton(button)) return
+
+            animateAddToCart(button)
+          },
+          true
+        )
+      })()
+    </script>
+    <!-- /KitobHub cart button animation -->
+
+  
+    <!-- KitobHub dynamic ad loader -->
+    <script>
+      ;(() => {
+        const API_BASE_URL = 'http://localhost:8088/api'
+
+        async function loadKitobHubAd() {
+          try {
+            const response = await fetch(`${API_BASE_URL}/ads/active`)
+            if (!response.ok) return
+
+            const ad = await response.json()
+
+            function applyAd() {
+              const cards = Array.from(
+                document.querySelectorAll('.sidebar-video-card, .sidebar-video-ad, .sidebar-ad-card')
+              )
+
+              const card = cards.find((item) => {
+                const text = item.textContent || ''
+                return text.includes('Kitob video reklamasi') || text.includes('VIDEO AD') || text.includes('BOOK TRAILER')
+              })
+
+              if (!card) return false
+
+              const badge = card.querySelector('.sidebar-ad-badge')
+              if (badge && ad.badge) badge.textContent = ad.badge
+
+              const title = card.querySelector('h3, h4')
+              if (title && ad.title) title.textContent = ad.title
+
+              const description = card.querySelector('p')
+              if (description && ad.description) description.textContent = ad.description
+
+              const iframe = card.querySelector('iframe')
+              if (iframe && ad.video_url && iframe.getAttribute('src') !== ad.video_url) {
+                iframe.setAttribute('src', ad.video_url)
+              }
+
+              const cover = card.querySelector('.sidebar-video-frame, .sidebar-video-cover')
+              if (cover && ad.poster_url) {
+                cover.style.backgroundImage =
+                  `linear-gradient(135deg, rgba(15, 23, 42, 0.18), rgba(79, 70, 229, 0.22)), url("${ad.poster_url}")`
+                cover.style.backgroundSize = 'cover'
+                cover.style.backgroundPosition = 'center'
+              }
+
+              const cta = card.querySelector('.sidebar-video-meta span, .sidebar-video-demo-tag')
+              if (cta && ad.cta_label) cta.textContent = ad.cta_label
+
+              return true
+            }
+
+            if (applyAd()) return
+
+            const observer = new MutationObserver(() => {
+              if (applyAd()) observer.disconnect()
+            })
+
+            observer.observe(document.body, {
+              childList: true,
+              subtree: true,
+            })
+          } catch {
+            // Demo UI ishlashda davom etadi.
+          }
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', loadKitobHubAd)
+        } else {
+          loadKitobHubAd()
+        }
+      })()
+    </script>
+    <!-- /KitobHub dynamic ad loader -->
+
   </body>
 </html>
