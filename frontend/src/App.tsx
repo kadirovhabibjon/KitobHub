@@ -22,7 +22,7 @@ type CartItem = {
   quantity: number
 }
 
-type Page = 'home' | 'book-detail' | 'favorites' | 'cart' | 'orders' | 'admin' | 'auth'
+type Page = 'home' | 'book-detail' | 'favorites' | 'cart' | 'orders' | 'admin' | 'auth' | 'delivery' | 'pickup-points'
 type OrderFormSource = 'buy-now' | 'cart' | null
 type AuthMode = 'login' | 'register'
 
@@ -198,6 +198,8 @@ function saveFavoriteBookIds(ids: number[]) {
 }
 
 function App() {
+  const [booksPage, setBooksPage] = useState(1)
+
   const [activePage, setActivePage] = useState<Page>('home')
   const [authMode, setAuthMode] = useState<AuthMode>('login')
   const [authForm, setAuthForm] = useState<AuthForm>(emptyAuthForm)
@@ -296,6 +298,28 @@ function App() {
       return firstBook.id - secondBook.id
     })
   }, [books, categoryFilter, sortOption])
+
+  const BOOKS_PER_PAGE = 20
+  const totalBookPages = Math.max(1, Math.ceil(filteredBooks.length / BOOKS_PER_PAGE))
+  const safeBooksPage = Math.min(booksPage, totalBookPages)
+  const paginatedBooks = filteredBooks.slice(
+    (safeBooksPage - 1) * BOOKS_PER_PAGE,
+    safeBooksPage * BOOKS_PER_PAGE,
+  )
+
+  function goToBooksPage(nextPage: number) {
+    const next = Math.min(Math.max(nextPage, 1), totalBookPages)
+
+    setBooksPage(next)
+
+    window.setTimeout(() => {
+      document.querySelector('.book-grid')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }, 0)
+  }
+
 
   const favoriteBooks = useMemo(() => {
     const favoriteIdSet = new Set(favoriteBookIds)
@@ -1354,7 +1378,8 @@ function App() {
         <section className="panel home-books-main">
           <div className="panel-header">
             <div>
-              <h2>Kitoblar</h2>
+
+          <h2>Kitoblar</h2>
               <p>Kitobni tanlang, darhol sotib oling yoki savatchaga qo‘shing.</p>
             </div>
 
@@ -1401,15 +1426,17 @@ function App() {
             </label>
 
             <div className="result-counter">
-              {filteredBooks.length} ta kitob
+              {paginatedBooks.length} / {filteredBooks.length} ta kitob
             </div>
           </div>
 
           {loading ? (
             <p className="muted">Yuklanmoqda...</p>
           ) : (
-            <div className="book-grid">
-              {filteredBooks.map((book) => (
+            <>
+            <div className="book-grid book-grid-page-animate" key={safeBooksPage}>
+              {renderMarketingShowcase()}
+              {paginatedBooks.map((book) => (
                 <article
                   className="book-card clickable-book-card"
                   key={book.id}
@@ -1501,9 +1528,286 @@ function App() {
                 </article>
               ))}
             </div>
+
+            {totalBookPages > 1 && (
+              <div className="book-pagination-controls" aria-label="Kitoblar sahifalari">
+                <button
+                  type="button"
+                  className="book-page-arrow book-page-arrow-left"
+                  onClick={() => goToBooksPage(safeBooksPage - 1)}
+                  disabled={safeBooksPage === 1}
+                  aria-label="Oldingi sahifa"
+                >
+                  ‹
+                </button>
+
+                <div className="book-page-status">
+                  <span>Sahifa</span>
+                  <strong>{safeBooksPage} / {totalBookPages}</strong>
+                </div>
+
+                <button
+                  type="button"
+                  className="book-page-arrow book-page-arrow-right"
+                  onClick={() => goToBooksPage(safeBooksPage + 1)}
+                  disabled={safeBooksPage === totalBookPages}
+                  aria-label="Keyingi sahifa"
+                >
+                  ›
+                </button>
+              </div>
+            )}
+            </>
           )}
         </section>
       </>
+    )
+  }
+
+
+
+  function renderPickupPointsPage() {
+    const pickupPoints = [
+      {
+        name: 'KitobHub Beruniy',
+        address: 'Toshkent shahri, Olmazor tumani, Talabalar ko‘chasi 16D',
+        time: '09:00–22:00, dam olish kunisiz',
+        phone: '+998 90 610 64 55',
+      },
+      {
+        name: 'KitobHub Kamolon',
+        address: 'Toshkent shahri, Shayxontohur tumani, 1-Oltin yo‘li, 34',
+        time: '09:00–22:00, dam olish kunisiz',
+        phone: '+998 71 200 01 05',
+      },
+      {
+        name: 'KitobHub Kitob Olami',
+        address: 'Toshkent, Yunusobod tumani, Mustaqillik prospekti, 6',
+        time: '10:00–23:00, dam olish kunisiz',
+        phone: '+998 90 037 06 45',
+      },
+      {
+        name: 'KitobHub Chilonzor',
+        address: 'Toshkent shahri, Chilonzor tumani, Bunyodkor shoh ko‘chasi',
+        time: '09:00–21:00',
+        phone: '+998 93 777 20 20',
+      },
+    ]
+
+    return (
+      <section className="pickup-page">
+        <div className="pickup-page-header">
+          <div>
+            <span className="pickup-breadcrumb">Bosh sahifa / Olib ketish punktlari</span>
+            <h2>Olib ketish punktlari</h2>
+          </div>
+
+          <div className="pickup-tabs">
+            <button type="button" className="active">Barcha viloyatlar</button>
+            <button type="button">KitobHub</button>
+            <button type="button">Toshkent</button>
+            <button type="button">Hamkor punktlar</button>
+          </div>
+        </div>
+
+        <div className="pickup-nearby-card">
+          <div className="pickup-nearby-icon">📍</div>
+
+          <div>
+            <span>YANGI</span>
+            <h3>Sizga yaqin punktlarni topish</h3>
+            <p>
+              Eng yaqin olib ketish punktlarini ko‘rsatamiz, shunda sizga qulay
+              manzilni tanlash osonroq bo‘ladi.
+            </p>
+            <small>
+              Joylashuv ma’lumotingiz faqat eng yaqin punktlarni aniqlash uchun
+              ishlatiladi.
+            </small>
+          </div>
+
+          <button type="button">Eng yaqin punktlarni ko‘rsatish →</button>
+        </div>
+
+        <div className="pickup-layout">
+          <aside className="pickup-list-panel">
+            <div className="pickup-search-box">
+              <input type="text" placeholder="Qidirish" />
+            </div>
+
+            <div className="pickup-list">
+              {pickupPoints.map((point) => (
+                <article className="pickup-point-card" key={point.name}>
+                  <div className="pickup-point-logo">A</div>
+
+                  <div>
+                    <h3>{point.name}</h3>
+                    <p>📍 {point.address}</p>
+                    <p>🕘 {point.time}</p>
+                    <p>☎ {point.phone}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </aside>
+
+          <section className="pickup-map-panel" aria-label="Olib ketish punktlari xaritasi">
+            <div className="pickup-map-toolbar">
+              <button type="button">➤</button>
+              <input type="text" placeholder="Adres yoki obyekt" />
+              <button type="button" className="pickup-map-search">Topish</button>
+            </div>
+
+            <div className="pickup-map-canvas">
+              <div className="pickup-map-road horizontal road-1" />
+              <div className="pickup-map-road horizontal road-2" />
+              <div className="pickup-map-road vertical road-3" />
+              <div className="pickup-map-road vertical road-4" />
+
+              {Array.from({ length: 28 }).map((_, index) => (
+                <span
+                  className="pickup-map-pin"
+                  style={{
+                    left: `${22 + ((index * 11) % 58)}%`,
+                    top: `${28 + ((index * 17) % 48)}%`,
+                  }}
+                  key={index}
+                >
+                  A
+                </span>
+              ))}
+
+              <div className="pickup-map-city city-one">Toshkent</div>
+              <div className="pickup-map-city city-two">Chirchiq</div>
+              <div className="pickup-map-city city-three">Yangiyo‘l</div>
+            </div>
+          </section>
+        </div>
+      </section>
+    )
+  }
+
+
+
+
+
+
+  function renderMarketingShowcase() {
+    return (
+      <section className="home-promo-banner-section" aria-label="KitobHub promo banner">
+        <article className="home-promo-banner">
+          <div className="home-promo-content">
+            <span className="home-promo-kicker">KITOBHUB PROMO</span>
+
+            <h2>Yangi kitoblar mavsumi</h2>
+
+            <p>
+              Dasturlash, badiiy adabiyot va biznes kitoblarini bitta joydan tanlang.
+              Eng kerakli kitoblar KitobHub’da sizni kutmoqda.
+            </p>
+
+            <button type="button" onClick={() => goToPage('home')}>
+              Kitoblarni ko‘rish
+            </button>
+          </div>
+
+          <div className="home-promo-visual" aria-hidden="true">
+            <div className="home-promo-book main-book">CL</div>
+            <div className="home-promo-book small-book one">SH</div>
+            <div className="home-promo-book small-book two">HP</div>
+          </div>
+        </article>
+      </section>
+    )
+  }
+
+  function renderDeliveryPage() {
+    return (
+      <section className="delivery-page">
+        <div className="delivery-hero-card">
+          <span className="delivery-eyebrow">KitobHub yetkazib berish xizmati</span>
+          <h2>Yetkazib berish</h2>
+          <p>
+            KitobHub orqali buyurtma qilingan kitoblar Toshkent shahri va hududlar
+            bo‘ylab qulay, xavfsiz va tez yetkazib beriladi.
+          </p>
+        </div>
+
+        <div className="delivery-content-card">
+          <h1>1. “Eshikkacha” odatiy yetkazib berish</h1>
+
+          <p>
+            Toshkent shahri bo‘ylab buyurtmalar odatda 24–72 soat ichida
+            yetkazib beriladi. Buyurtma holati o‘zgarganda mijozga xabar beriladi.
+          </p>
+
+          <p>
+            Hududlarga yetkazib berish kuryerlik xizmati orqali amalga oshiriladi.
+            Viloyat markazlariga buyurtmalar taxminan 2 ish kuni, tumanlarga esa
+            5 ish kunigacha yetkazilishi mumkin.
+          </p>
+
+          <p>
+            Buyurtma rasmiylashtirilayotganda telefon raqami, F.I.O. va yetkazib
+            berish manzilini to‘g‘ri kiritish muhim. Kuryer yetib kelganda
+            buyurtmani qabul qiluvchi shaxs ma’lumotlarni tasdiqlashi mumkin.
+          </p>
+
+          <div className="delivery-highlight-box">
+            <strong>Toshkent shahri uchun:</strong>
+            <span>
+              1 000 000 so‘mgacha bo‘lgan buyurtmalar uchun yetkazib berish narxi
+              30 000 so‘m. 1 000 000 so‘mdan yuqori buyurtmalar uchun yetkazib
+              berish bepul bo‘lishi mumkin.
+            </span>
+          </div>
+
+          <div className="delivery-highlight-box">
+            <strong>Hududlar uchun:</strong>
+            <span>
+              Narx buyurtmaning vazni, o‘lchami, manzili va kuryerlik xizmatiga
+              qarab belgilanadi.
+            </span>
+          </div>
+
+          <ul className="delivery-list">
+            <li>Viloyat markazlariga — 2 ish kuni ichida.</li>
+            <li>Tumanlarga — 5 ish kunigacha.</li>
+            <li>Buyurtma holatini “Buyurtmalar” bo‘limida kuzatish mumkin.</li>
+          </ul>
+
+          <div className="delivery-form-preview">
+            <div className="delivery-form-header">Buyurtma rasmiylashtirish</div>
+
+            <div className="delivery-form-grid">
+              <label>
+                Telefon
+                <span>+998 90 123 45 67</span>
+              </label>
+
+              <label>
+                F.I.O.
+                <span>Habibjon Kadirov</span>
+              </label>
+
+              <label>
+                Viloyat
+                <span>Toshkent shahri</span>
+              </label>
+
+              <label>
+                Shahar / Tuman
+                <span>Chilonzor tumani</span>
+              </label>
+            </div>
+
+            <div className="delivery-form-note">
+              Yetkazib berish manzili checkout formasi orqali olinadi va
+              order-service’da saqlanadi.
+            </div>
+          </div>
+        </div>
+      </section>
     )
   }
 
@@ -2034,6 +2338,8 @@ function App() {
         </div>
       )}
 
+      {activePage === 'pickup-points' && renderPickupPointsPage()}
+      {activePage === 'delivery' && renderDeliveryPage()}
       {activePage === 'home' && renderBooksPage()}
       {activePage === 'book-detail' && renderBookDetailPage()}
       {activePage === 'favorites' && renderFavoritesPage()}
@@ -2053,13 +2359,13 @@ function App() {
               </div>
             </article>
 
-            <article className="footer-benefit-item">
+            <button type="button" className="footer-benefit-item footer-benefit-button" onClick={() => goToPage('delivery')}>
               <span className="footer-benefit-icon">🚚</span>
               <div>
                 <h3>Tez yetkazib berish</h3>
                 <p>Buyurtmalar qisqa vaqt ichida manzilingizga yetkaziladi.</p>
               </div>
-            </article>
+            </button>
 
             <article className="footer-benefit-item">
               <span className="footer-benefit-icon">💳</span>
@@ -2096,7 +2402,7 @@ function App() {
               <a href="#">Buyurtma holatini kuzatish</a>
               <a href="#">Ommaviy oferta</a>
               <a href="#">Qaytarish shartlari</a>
-              <a href="#">Yetkazib berish tartibi</a>
+              <button type="button" className="footer-link-button" onClick={() => goToPage('delivery')}>Yetkazib berish tartibi</button>
             </div>
 
             <div className="footer-column">
@@ -2111,8 +2417,8 @@ function App() {
             <div className="footer-column footer-delivery">
               <h3>Yetkazib berish va do‘konlar</h3>
               <button type="button">🏬 Bizning do‘konlar <span>›</span></button>
-              <button type="button">📍 Olib ketish punktlari <span>›</span></button>
-              <button type="button">🚚 Yetkazib berish <span>›</span></button>
+              <button type="button" onClick={() => goToPage('pickup-points')}>📍 Olib ketish punktlari <span>›</span></button>
+              <button type="button" onClick={() => goToPage('delivery')}>🚚 Yetkazib berish <span>›</span></button>
             </div>
 
             <div className="footer-column footer-contact">
