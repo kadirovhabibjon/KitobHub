@@ -36,3 +36,6 @@ docker-data/
 postgres-data/
 redis-data/
 kafka-data/
+
+.env
+frontend/.env

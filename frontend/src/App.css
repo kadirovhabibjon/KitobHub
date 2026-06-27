@@ -2859,3 +2859,1497 @@ button:disabled {
     font-size: 14px;
   }
 }
+
+
+
+
+
+
+
+/* Card */
+.book-grid > article,
+.book-grid > .book-card,
+.book-grid > .catalog-card,
+.book-grid > .product-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 365px !important;
+  min-height: 365px !important;
+  max-height: 365px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(148, 163, 184, 0.24) !important;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Cover */
+.book-grid > article > div:first-child,
+.book-grid > .book-card > div:first-child,
+.book-grid > .catalog-card > div:first-child,
+.book-grid > .product-card > div:first-child {
+  height: 118px !important;
+  min-height: 118px !important;
+  max-height: 118px !important;
+}
+
+/* Body */
+.book-grid > article > div:last-child,
+.book-grid > .book-card > div:last-child,
+.book-grid > .catalog-card > div:last-child,
+.book-grid > .product-card > div:last-child {
+  flex: 1 !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 13px 14px 14px !important;
+}
+
+/* Category */
+.book-grid small,
+.book-grid [class*="category"] {
+  display: inline-block !important;
+  margin-bottom: 7px !important;
+  color: #4f63ff !important;
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+}
+
+/* Title */
+.book-grid h3 {
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  margin: 0 0 7px !important;
+  overflow: hidden !important;
+  color: #0f172a !important;
+  font-size: 16px !important;
+  line-height: 1.28 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Description */
+.book-grid p {
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  margin: 0 0 9px !important;
+  overflow: hidden !important;
+  color: #667085 !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+}
+
+/* Meta row */
+.book-grid h3 + p + div,
+.book-grid [class*="meta"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  margin: auto 0 9px !important;
+  color: #667085 !important;
+  font-size: 11px !important;
+  line-height: 1.25 !important;
+}
+
+/* Price */
+.book-grid strong {
+  display: block !important;
+  margin: 0 0 10px !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 1000 !important;
+  white-space: nowrap !important;
+}
+
+/* Buttons */
+.book-grid [class*="actions"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 44px !important;
+  gap: 9px !important;
+  align-items: center !important;
+  margin-top: auto !important;
+}
+
+.book-grid [class*="actions"] button {
+  height: 44px !important;
+  min-height: 44px !important;
+  border-radius: 13px !important;
+  padding: 0 10px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.book-grid [class*="actions"] button:first-child {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.book-grid [class*="actions"] button:last-child {
+  width: 44px !important;
+  min-width: 44px !important;
+  padding: 0 !important;
+  font-size: 18px !important;
+}
+
+/* Heart/favorite */
+.book-grid button[class*="favorite"],
+.book-grid [class*="heart"] {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+}
+
+/* Banner mustasno */
+.home-promo-banner {
+  height: auto !important;
+  min-height: 220px !important;
+  max-height: none !important;
+}
+
+@media (max-width: 1450px) {
+  .store-with-tools-layout {
+    width: min(1320px, calc(100vw - 64px)) !important;
+    grid-template-columns: minmax(0, 1fr) 270px !important;
+  }
+
+  .store-tools-sidebar {
+    width: 270px !important;
+    max-width: 270px !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(3, minmax(210px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1120px) {
+  .store-with-tools-layout {
+    width: min(960px, calc(100vw - 32px)) !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .store-tools-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .store-with-tools-layout {
+    width: calc(100vw - 24px) !important;
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .book-grid > article,
+  .book-grid > .book-card,
+  .book-grid > .catalog-card,
+  .book-grid > .product-card {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+}
+
+
+
+/* Asosiy book card */
+.book-grid > article,
+.book-grid > .book-card,
+.book-grid > .catalog-card,
+.book-grid > .product-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 430px !important;
+  height: auto !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-radius: 22px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(148, 163, 184, 0.24) !important;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.07) !important;
+}
+
+/* Cover qismi */
+.book-card-cover,
+.book-cover,
+.product-card-cover,
+.catalog-card-cover,
+.book-grid > article > div:first-child {
+  height: 136px !important;
+  min-height: 136px !important;
+  max-height: 136px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Body qismi */
+.book-card-body,
+.book-body,
+.product-card-body,
+.catalog-card-body,
+.book-grid > article > div:last-child {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 14px !important;
+}
+
+/* Kategoriya */
+.book-category,
+.book-card-category,
+.product-category,
+.catalog-category,
+.book-grid small {
+  display: block !important;
+  margin-bottom: 8px !important;
+  color: #4f63ff !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+}
+
+/* Sarlavha */
+.book-grid h3 {
+  display: -webkit-box !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  margin: 0 0 8px !important;
+  overflow: hidden !important;
+  color: #0f172a !important;
+  font-size: 16px !important;
+  line-height: 1.3 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+/* Description */
+.book-grid p {
+  display: -webkit-box !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  margin: 0 0 10px !important;
+  overflow: hidden !important;
+  color: #667085 !important;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+/* Author va stock */
+.book-meta,
+.book-card-meta,
+.product-meta,
+.catalog-meta,
+.book-grid h3 + p + div {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  margin: 0 0 10px !important;
+  color: #667085 !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+}
+
+.book-meta span,
+.book-card-meta span,
+.product-meta span,
+.catalog-meta span,
+.book-grid h3 + p + div span {
+  min-width: 0 !important;
+  max-width: 50% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Narx */
+.book-grid strong {
+  display: block !important;
+  margin: auto 0 12px !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 1000 !important;
+  white-space: nowrap !important;
+}
+
+/* Buttonlar qatori */
+.book-actions,
+.book-card-actions,
+.product-card-actions,
+.catalog-card-actions,
+.book-grid [class*="actions"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 46px !important;
+  gap: 9px !important;
+  align-items: center !important;
+  margin-top: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Buttonlar */
+.book-actions button,
+.book-card-actions button,
+.product-card-actions button,
+.catalog-card-actions button,
+.book-grid [class*="actions"] button {
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  border-radius: 13px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+/* Xarid qilish button */
+.book-actions button:first-child,
+.book-card-actions button:first-child,
+.product-card-actions button:first-child,
+.catalog-card-actions button:first-child,
+.book-grid [class*="actions"] button:first-child {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 12px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Savatcha button */
+.book-actions button:last-child,
+.book-card-actions button:last-child,
+.product-card-actions button:last-child,
+.catalog-card-actions button:last-child,
+.book-grid [class*="actions"] button:last-child {
+  width: 46px !important;
+  min-width: 46px !important;
+  padding: 0 !important;
+  font-size: 18px !important;
+}
+
+/* Yurakcha */
+.favorite-button,
+.book-favorite-button,
+.book-grid button[class*="favorite"] {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 999px !important;
+}
+
+/* Banner mustasno */
+.home-promo-banner {
+  min-height: 220px !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* 4 ta sig'magan ekranlarda avtomatik 3 ta bo'ladi */
+@media (max-width: 1450px) {
+  .store-with-tools-layout {
+    width: min(1320px, calc(100vw - 64px)) !important;
+    grid-template-columns: minmax(0, 1fr) 270px !important;
+  }
+
+  .store-tools-sidebar {
+    width: 270px !important;
+    max-width: 270px !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(3, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1120px) {
+  .store-with-tools-layout {
+    width: min(960px, calc(100vw - 32px)) !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .store-tools-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .store-with-tools-layout {
+    width: calc(100vw - 24px) !important;
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+
+/* Card umumiy */
+.book-grid > article,
+.book-grid > .book-card,
+.book-grid > .catalog-card,
+.book-grid > .product-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 390px !important;
+  height: auto !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(148, 163, 184, 0.24) !important;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.07) !important;
+}
+
+/* Cover */
+.book-grid > article > div:first-child,
+.book-card-cover,
+.book-cover,
+.product-card-cover,
+.catalog-card-cover {
+  height: 122px !important;
+  min-height: 122px !important;
+  max-height: 122px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Body grid: narx + savatcha bir qatorda, xarid button pastida */
+.book-grid > article > div:last-child,
+.book-card-body,
+.book-body,
+.product-card-body,
+.catalog-card-body {
+  flex: 1 !important;
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 44px !important;
+  grid-template-rows: auto auto auto auto auto auto !important;
+  column-gap: 9px !important;
+  row-gap: 0 !important;
+  padding: 13px 14px 14px !important;
+}
+
+/* Category */
+.book-grid > article:not(.home-promo-banner-section) small,
+.book-grid > article:not(.home-promo-banner-section) [class*="category"],
+.book-card-category,
+.book-category,
+.product-category,
+.catalog-category {
+  grid-column: 1 / -1 !important;
+  margin: 0 0 8px !important;
+  color: #4f63ff !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+}
+
+/* Title */
+.book-grid > article h3,
+.book-card h3,
+.product-card h3,
+.catalog-card h3 {
+  grid-column: 1 / -1 !important;
+  display: -webkit-box !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  margin: 0 0 8px !important;
+  overflow: hidden !important;
+  color: #0f172a !important;
+  font-size: 16px !important;
+  line-height: 1.3 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+/* Description */
+.book-grid > article p,
+.book-card p,
+.product-card p,
+.catalog-card p {
+  grid-column: 1 / -1 !important;
+  display: -webkit-box !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  margin: 0 0 10px !important;
+  overflow: hidden !important;
+  color: #667085 !important;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+/* Author / Stock */
+.book-grid > article h3 + p + div,
+.book-meta,
+.book-card-meta,
+.product-meta,
+.catalog-meta {
+  grid-column: 1 / -1 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  margin: 0 0 10px !important;
+  color: #667085 !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+}
+
+.book-grid > article h3 + p + div span,
+.book-meta span,
+.book-card-meta span,
+.product-meta span,
+.catalog-meta span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Price chapda */
+.book-grid > article strong,
+.book-card strong,
+.product-card strong,
+.catalog-card strong {
+  grid-column: 1 / 2 !important;
+  align-self: center !important;
+  display: block !important;
+  margin: auto 0 10px !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 1000 !important;
+  white-space: nowrap !important;
+}
+
+/* Actions container grid ichiga buttonlarni chiqaramiz */
+.book-actions,
+.book-card-actions,
+.product-card-actions,
+.catalog-card-actions,
+.book-grid [class*="actions"] {
+  display: contents !important;
+}
+
+/* Savatcha button narxning o'ngida */
+.book-actions button:last-child,
+.book-card-actions button:last-child,
+.product-card-actions button:last-child,
+.catalog-card-actions button:last-child,
+.book-grid [class*="actions"] button:last-child {
+  grid-column: 2 / 3 !important;
+  align-self: center !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  margin: auto 0 10px !important;
+  padding: 0 !important;
+  border-radius: 13px !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+}
+
+/* Xarid qilish button pastida uzun */
+.book-actions button:first-child,
+.book-card-actions button:first-child,
+.product-card-actions button:first-child,
+.catalog-card-actions button:first-child,
+.book-grid [class*="actions"] button:first-child {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 13px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+/* Yurakcha */
+.favorite-button,
+.book-favorite-button,
+.book-grid button[class*="favorite"] {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 999px !important;
+}
+
+/* Banner mustasno */
+.home-promo-banner {
+  min-height: 220px !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Kichikroq ekranlarda toza ko'rinish */
+@media (max-width: 1450px) {
+  .store-with-tools-layout {
+    width: min(1320px, calc(100vw - 64px)) !important;
+    grid-template-columns: minmax(0, 1fr) 270px !important;
+  }
+
+  .store-tools-sidebar {
+    width: 270px !important;
+    max-width: 270px !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(3, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1120px) {
+  .store-with-tools-layout {
+    width: min(960px, calc(100vw - 32px)) !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .store-tools-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .store-with-tools-layout {
+    width: calc(100vw - 24px) !important;
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+
+/* Card */
+.book-grid > article,
+.book-grid > .book-card,
+.book-grid > .catalog-card,
+.book-grid > .product-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 405px !important;
+  height: auto !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(148, 163, 184, 0.24) !important;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.07) !important;
+}
+
+/* Cover */
+.book-grid > article > div:first-child,
+.book-card-cover,
+.book-cover,
+.product-card-cover,
+.catalog-card-cover {
+  height: 122px !important;
+  min-height: 122px !important;
+  max-height: 122px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Body */
+.book-grid > article > div:last-child,
+.book-card-body,
+.book-body,
+.product-card-body,
+.catalog-card-body {
+  flex: 1 !important;
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 44px !important;
+  grid-template-rows:
+    auto
+    44px
+    38px
+    38px
+    44px
+    44px !important;
+  column-gap: 10px !important;
+  row-gap: 8px !important;
+  padding: 13px 14px 14px !important;
+}
+
+/* Category */
+.book-grid small,
+.book-grid [class*="category"] {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+  display: block !important;
+  margin: 0 !important;
+  color: #4f63ff !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+}
+
+/* Title */
+.book-grid h3 {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  display: -webkit-box !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  color: #0f172a !important;
+  font-size: 16px !important;
+  line-height: 1.32 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+/* Description */
+.book-grid p {
+  grid-column: 1 / -1 !important;
+  grid-row: 3 !important;
+  display: -webkit-box !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  color: #667085 !important;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+/* Author / Stock */
+.book-grid h3 + p + div,
+.book-meta,
+.book-card-meta,
+.product-meta,
+.catalog-meta {
+  grid-column: 1 / -1 !important;
+  grid-row: 4 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: start !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  color: #667085 !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  overflow: hidden !important;
+}
+
+.book-grid h3 + p + div span,
+.book-meta span,
+.book-card-meta span,
+.product-meta span,
+.catalog-meta span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Narx chapda, savatcha shu qatorda o'ngda */
+.book-grid strong {
+  grid-column: 1 / 2 !important;
+  grid-row: 5 !important;
+  align-self: center !important;
+  display: block !important;
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 1000 !important;
+  white-space: nowrap !important;
+}
+
+/* Actions container ichidagi buttonlarni body grid item qilamiz */
+.book-actions,
+.book-card-actions,
+.product-card-actions,
+.catalog-card-actions,
+.book-grid [class*="actions"] {
+  display: contents !important;
+}
+
+/* Savatcha — narx bilan bitta qatorda, o'ng tomonda */
+.book-actions button:last-child,
+.book-card-actions button:last-child,
+.product-card-actions button:last-child,
+.catalog-card-actions button:last-child,
+.book-grid [class*="actions"] button:last-child {
+  grid-column: 2 / 3 !important;
+  grid-row: 5 !important;
+  align-self: center !important;
+  justify-self: end !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 13px !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+}
+
+/* Xarid qilish — pastda uzun button */
+.book-actions button:first-child,
+.book-card-actions button:first-child,
+.product-card-actions button:first-child,
+.catalog-card-actions button:first-child,
+.book-grid [class*="actions"] button:first-child {
+  grid-column: 1 / -1 !important;
+  grid-row: 6 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 13px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+/* Yurakcha */
+.favorite-button,
+.book-favorite-button,
+.book-grid button[class*="favorite"] {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 999px !important;
+}
+
+/* Banner mustasno */
+.home-promo-banner {
+  min-height: 220px !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+@media (max-width: 1450px) {
+  .store-with-tools-layout {
+    width: min(1320px, calc(100vw - 64px)) !important;
+    grid-template-columns: minmax(0, 1fr) 270px !important;
+  }
+
+  .store-tools-sidebar {
+    width: 270px !important;
+    max-width: 270px !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(3, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1120px) {
+  .store-with-tools-layout {
+    width: min(960px, calc(100vw - 32px)) !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .store-tools-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .store-with-tools-layout {
+    width: calc(100vw - 24px) !important;
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* KitobHub absolute fixed card buttons */
+.store-with-tools-layout {
+  width: min(1500px, calc(100vw - 72px)) !important;
+  max-width: 1500px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 285px !important;
+  gap: 28px !important;
+  align-items: start !important;
+}
+
+.store-books-area {
+  min-width: 0 !important;
+}
+
+.store-tools-sidebar {
+  width: 285px !important;
+  max-width: 285px !important;
+}
+
+.book-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(180px, 1fr)) !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+  margin-top: 18px !important;
+}
+
+.book-grid > .home-promo-banner-section,
+.book-grid > .book-pagination-controls {
+  grid-column: 1 / -1 !important;
+}
+
+/* Card */
+.book-grid > article,
+.book-grid > .book-card,
+.book-grid > .catalog-card,
+.book-grid > .product-card {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 410px !important;
+  height: 410px !important;
+  max-height: 410px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(148, 163, 184, 0.24) !important;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.07) !important;
+}
+
+/* Cover */
+.book-grid > article > div:first-child,
+.book-card-cover,
+.book-cover,
+.product-card-cover,
+.catalog-card-cover {
+  height: 122px !important;
+  min-height: 122px !important;
+  max-height: 122px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Body */
+.book-grid > article > div:last-child,
+.book-card-body,
+.book-body,
+.product-card-body,
+.catalog-card-body {
+  position: static !important;
+  flex: 1 !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 13px 14px 120px !important;
+}
+
+/* Category */
+.book-grid small,
+.book-grid [class*="category"] {
+  display: block !important;
+  margin: 0 0 8px !important;
+  color: #4f63ff !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+}
+
+/* Title */
+.book-grid h3 {
+  display: -webkit-box !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  margin: 0 0 8px !important;
+  overflow: hidden !important;
+  color: #0f172a !important;
+  font-size: 16px !important;
+  line-height: 1.3 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+/* Description */
+.book-grid p {
+  display: -webkit-box !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  margin: 0 0 10px !important;
+  overflow: hidden !important;
+  color: #667085 !important;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+/* Author / Stock */
+.book-grid h3 + p + div,
+.book-meta,
+.book-card-meta,
+.product-meta,
+.catalog-meta {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: start !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  color: #667085 !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  overflow: hidden !important;
+}
+
+.book-grid h3 + p + div span,
+.book-meta span,
+.book-card-meta span,
+.product-meta span,
+.catalog-meta span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* NARX — pastda chapda */
+.book-grid > article strong,
+.book-grid > .book-card strong,
+.book-grid > .catalog-card strong,
+.book-grid > .product-card strong {
+  position: absolute !important;
+  left: 14px !important;
+  right: 66px !important;
+  bottom: 70px !important;
+  z-index: 5 !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 44px !important;
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 1000 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Actions container */
+.book-actions,
+.book-card-actions,
+.product-card-actions,
+.catalog-card-actions,
+.book-grid [class*="actions"] {
+  display: contents !important;
+}
+
+/* SAVATCHA — narx bilan bitta qatorda o'ngda */
+.book-actions button:last-child,
+.book-card-actions button:last-child,
+.product-card-actions button:last-child,
+.catalog-card-actions button:last-child,
+.book-grid [class*="actions"] button:last-child {
+  position: absolute !important;
+  right: 14px !important;
+  bottom: 70px !important;
+  z-index: 6 !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 13px !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+}
+
+/* XARID QILISH — pastida uzun button */
+.book-actions button:first-child,
+.book-card-actions button:first-child,
+.product-card-actions button:first-child,
+.catalog-card-actions button:first-child,
+.book-grid [class*="actions"] button:first-child {
+  position: absolute !important;
+  left: 14px !important;
+  right: 14px !important;
+  bottom: 14px !important;
+  z-index: 6 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 13px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+/* Yurakcha */
+.favorite-button,
+.book-favorite-button,
+.book-grid button[class*="favorite"] {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 999px !important;
+}
+
+/* Banner mustasno */
+.home-promo-banner {
+  min-height: 220px !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+@media (max-width: 1450px) {
+  .store-with-tools-layout {
+    width: min(1320px, calc(100vw - 64px)) !important;
+    grid-template-columns: minmax(0, 1fr) 270px !important;
+  }
+
+  .store-tools-sidebar {
+    width: 270px !important;
+    max-width: 270px !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(3, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1120px) {
+  .store-with-tools-layout {
+    width: min(960px, calc(100vw - 32px)) !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .store-tools-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .store-with-tools-layout {
+    width: calc(100vw - 24px) !important;
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* KitobHub working support chat */
+.support-chat-widget {
+  position: fixed;
+  right: 26px;
+  bottom: 24px;
+  z-index: 99999;
+  font-family: inherit;
+}
+
+.support-chat-fab {
+  width: 66px;
+  height: 66px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0066ff, #0a7cff);
+  color: #ffffff;
+  font-size: 30px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 18px 40px rgba(0, 102, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.support-chat-fab:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 24px 52px rgba(0, 102, 255, 0.42);
+}
+
+.support-chat-fab-open {
+  transform: rotate(4deg);
+}
+
+.support-chat-panel {
+  position: absolute;
+  right: 0;
+  bottom: 82px;
+  width: min(380px, calc(100vw - 32px));
+  height: 560px;
+  max-height: calc(100vh - 130px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.24);
+}
+
+.support-chat-header {
+  padding: 18px;
+  background: linear-gradient(135deg, #071225, #0f2f7a 55%, #0066ff);
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.support-chat-header h3 {
+  margin: 6px 0 4px;
+  font-size: 19px;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.support-chat-header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.support-chat-badge {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.18);
+  color: #bbf7d0;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.support-chat-close {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.support-chat-quick-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  background: #f8fbff;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.support-chat-quick-actions button {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 12px;
+  background: #eaf2ff;
+  color: #0052cc;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.support-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: linear-gradient(180deg, #f8fbff, #ffffff);
+}
+
+.support-chat-message {
+  width: fit-content;
+  max-width: 86%;
+  margin-bottom: 12px;
+  padding: 11px 13px 8px;
+  border-radius: 18px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.support-chat-message p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.support-chat-message span {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  opacity: 0.72;
+}
+
+.support-chat-message-assistant {
+  margin-right: auto;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-bottom-left-radius: 6px;
+}
+
+.support-chat-message-user {
+  margin-left: auto;
+  background: #0066ff;
+  color: #ffffff;
+  border-bottom-right-radius: 6px;
+}
+
+.support-chat-form {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  background: #ffffff;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.support-chat-form input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  padding: 0 13px;
+  font-size: 13px;
+  outline: none;
+}
+
+.support-chat-form input:focus {
+  border-color: #0066ff;
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.12);
+}
+
+.support-chat-form button {
+  height: 44px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 16px;
+  background: #071225;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.support-chat-clear {
+  border: 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 10px;
+  background: #f8fbff;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .support-chat-widget {
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .support-chat-panel {
+    width: calc(100vw - 32px);
+    height: min(560px, calc(100vh - 118px));
+    bottom: 78px;
+  }
+
+  .support-chat-fab {
+    width: 60px;
+    height: 60px;
+    font-size: 27px;
+  }
+}

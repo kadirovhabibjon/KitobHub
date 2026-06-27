@@ -1507,7 +1507,7 @@ function App() {
                         >
                           {book.stock_quantity <= 0
                             ? 'Tugagan'
-                            : 'Hoziroq xarid qilish'}
+                            : 'Xarid qilish'}
                         </button>
 
                         <button
@@ -1886,7 +1886,7 @@ function App() {
                 onClick={() => handleBuyNow(book)}
                 disabled={book.stock_quantity <= 0 || orderLoading}
               >
-                {book.stock_quantity <= 0 ? 'Tugagan' : 'Hoziroq xarid qilish'}
+                {book.stock_quantity <= 0 ? 'Tugagan' : 'Xarid qilish'}
               </button>
 
               <button
